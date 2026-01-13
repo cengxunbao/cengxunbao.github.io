@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Bảo Hành -NHƠN TRẠCH</title>
+    <title>Quản Lý Bảo Hành - Auto Cloud</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -80,7 +80,7 @@
     <header class="no-print">
         <div>
             <h1 style="margin:0; font-size: 22px;">MÁY TÍNH NHƠN TRẠCH</h1>
-            <div id="cloudStatus"><div class="loading-dot" id="cloudDot"></div> <span id="cloudMsg">Đang kết nối Cloud...</span></div>
+            <div id="cloudStatus"><div class="loading-dot" id="cloudDot"></div> <span id="cloudMsg">Đang kết nối Google Sheets...</span></div>
         </div>
         <div class="stats-group">
             <div class="stat-card"><label>Tổng đơn</label><span id="countTotal">0</span></div>
@@ -166,16 +166,12 @@
 </div>
 
 <script>
-    // CẤU HÌNH CỐ ĐỊNH CỦA BẠN
-    const CLOUD_CONFIG = {
-        token: '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',
-        gistId: 'a18fa5445cddb3cb337b3c7a74339f6f'
-    };
+    // --- CẤU HÌNH GOOGLE SHEETS ---
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZKTxQweonx1b1J59qS0P2UGIyBoWsLgTjjkP0vdqqc9KxVxpDC-Fe60IWGmaonepMCw/exec';
 
     let db = JSON.parse(localStorage.getItem('nt_v6_db') || '[]');
     let partners = JSON.parse(localStorage.getItem('nt_v6_partners') || '["Vi tính Nguyễn Thắng"]');
 
-    // Tự động tải dữ liệu khi mở trang
     window.onload = () => {
         restoreFromCloud();
     };
@@ -184,7 +180,6 @@
         localStorage.setItem('nt_v6_db', JSON.stringify(db));
         localStorage.setItem('nt_v6_partners', JSON.stringify(partners));
         render();
-        // Tự động Backup lên Cloud mỗi khi lưu
         await backupToCloud();
     }
 
@@ -198,48 +193,40 @@
     }
 
     async function backupToCloud() {
-        updateCloudUI('loading', 'Đang đồng bộ lên mây...');
-        const data = {
-            files: {
-                "baohanh_db.json": { content: JSON.stringify(db) },
-                "partners_db.json": { content: JSON.stringify(partners) }
-            }
-        };
-
+        if (!GOOGLE_SCRIPT_URL.startsWith('http')) return;
+        updateCloudUI('loading', 'Đang sao lưu Sheets...');
         try {
-            const res = await fetch(`https://api.github.com/gists/${CLOUD_CONFIG.gistId}`, {
-                method: 'PATCH',
-                headers: { 'Authorization': `token ${CLOUD_CONFIG.token}` },
-                body: JSON.stringify(data)
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Quan trọng để tránh lỗi CORS
+                body: JSON.stringify({db, partners})
             });
-            if (res.ok) {
-                updateCloudUI('success', 'Đã đồng bộ lên mây');
-            } else {
-                updateCloudUI('error', 'Lỗi đồng bộ!');
-            }
+            updateCloudUI('success', 'Đã lưu lên Google Sheets');
         } catch (err) {
-            updateCloudUI('error', 'Mất kết nối Cloud');
+            updateCloudUI('error', 'Lỗi kết nối Sheets');
         }
     }
 
     async function restoreFromCloud() {
-        updateCloudUI('loading', 'Đang tải dữ liệu từ mây...');
+        if (!GOOGLE_SCRIPT_URL.startsWith('http')) {
+            updateCloudUI('error', 'Chưa cấu hình Link Sheets');
+            return;
+        }
+        updateCloudUI('loading', 'Đang tải từ Sheets...');
         try {
-            const res = await fetch(`https://api.github.com/gists/${CLOUD_CONFIG.gistId}`, {
-                headers: { 'Authorization': `token ${CLOUD_CONFIG.token}` }
-            });
-            const result = await res.json();
-            if (res.ok) {
-                db = JSON.parse(result.files["baohanh_db.json"].content);
-                partners = JSON.parse(result.files["partners_db.json"].content);
+            const res = await fetch(GOOGLE_SCRIPT_URL);
+            const data = await res.json();
+            if (data) {
+                db = data.db || [];
+                partners = data.partners || ["Vi tính Nguyễn Thắng"];
                 localStorage.setItem('nt_v6_db', JSON.stringify(db));
                 localStorage.setItem('nt_v6_partners', JSON.stringify(partners));
                 render();
-                updateCloudUI('success', 'Dữ liệu mới nhất');
-                showToast('Đã tải dữ liệu từ Cloud!');
+                updateCloudUI('success', 'Đã đồng bộ');
+                showToast('Đã tải dữ liệu mới nhất!');
             }
         } catch (err) {
-            updateCloudUI('error', 'Không thể tải dữ liệu');
+            updateCloudUI('error', 'Lỗi tải dữ liệu');
         }
     }
 
@@ -376,7 +363,7 @@
     }
 
     function deleteItem(id) {
-        if(confirm('Xóa đơn này và đồng bộ lên mây?')) {
+        if(confirm('Xóa đơn này?')) {
             db = db.filter(i => i.id !== id);
             save();
         }

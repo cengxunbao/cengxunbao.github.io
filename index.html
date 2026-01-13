@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Bảo Hành - Nhơn Trạch v6.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5; --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+            --dark: #1e293b; --light: #f8fafc; --border: #e2e8f0; --purple: #8b5cf6;
+        }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #334155; }
+        .container { max-width: 1500px; margin: auto; }
+
+        /* Header */
+        header { 
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%); 
+            color: white; padding: 25px; border-radius: 16px; margin-bottom: 25px; 
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+        .stats-group { display: flex; gap: 15px; }
+        .stat-card { background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .stat-card span { display: block; font-size: 22px; font-weight: 800; }
+        .stat-card label { font-size: 11px; text-transform: uppercase; opacity: 0.8; }
+
+        /* Grid */
+        .main-grid { display: grid; grid-template-columns: 360px 1fr; gap: 25px; }
+        @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } }
+
+        .card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        h3 { margin: 0 0 20px 0; font-size: 18px; color: var(--dark); }
+
+        /* Form */
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; text-transform: uppercase; }
+        input, select, textarea { 
+            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; 
+            font-size: 14px; box-sizing: border-box; background: #fcfcfd;
+        }
+        .loan-banner { background: #fff7ed; border: 1px solid #fed7aa; padding: 15px; border-radius: 12px; border-left: 4px solid var(--warning); margin: 20px 0; }
+
+        /* Buttons */
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn { padding: 10px 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: white; border: 1px solid var(--border); color: var(--dark); }
+
+        /* Table */
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        th { background: #f8fafc; padding: 14px; text-align: left; font-size: 12px; color: #64748b; border-bottom: 2px solid #f1f5f9; }
+        td { padding: 16px 14px; border-bottom: 1px solid #f1f5f9; font-size: 14px; vertical-align: top; }
+        
+        /* Copy Badge */
+        .copy-btn { 
+            display: inline-flex; align-items: center; background: #f1f5f9; border: 1px solid #e2e8f0; 
+            padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; margin-left: 5px; color: #475569;
+        }
+        .copy-btn:hover { background: var(--primary); color: white; }
+
+        /* Status */
+        .badge { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; border: none; }
+        .status-0 { background: #fee2e2; color: #dc2626; }
+        .status-1 { background: #fef3c7; color: #d97706; }
+        .status-2 { background: #dcfce7; color: #16a34a; }
+        .status-3 { background: #e0e7ff; color: #4f46e5; }
+        
+        .loan-item { color: var(--purple); font-weight: 700; }
+        .returned { text-decoration: line-through; opacity: 0.5; }
+
+        /* Custom alert */
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 10px 20px; border-radius: 30px; font-size: 13px; display: none; z-index: 1000; box-shadow: 0 10px 15px rgba(0,0,0,0.2); }
+
+        @media print { .no-print { display: none !important; } #printTicket { display: block !important; } }
+        #printTicket { display: none; font-family: sans-serif; }
+    </style>
+</head>
+<body>
+
+<div id="toast">Đã sao chép!</div>
+
+<div class="container">
+    <header class="no-print">
+        <div>
+            <h1 style="margin:0; font-size: 22px;">MÁY TÍNH NHƠN TRẠCH</h1>
+            <p style="margin:5px 0 0; opacity: 0.7; font-size: 12px;">Hệ thống quản lý bảo hành chuyên nghiệp</p>
+        </div>
+        <div class="stats-group">
+            <div class="stat-card"><label>Tổng đơn</label><span id="countTotal">0</span></div>
+            <div class="stat-card" style="color: #fbbf24;"><label>Đang mượn</label><span id="countLoan">0</span></div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-outline" onclick="exportJSON()">📤 Xuất JSON</button>
+            <button class="btn btn-outline" onclick="document.getElementById('fileInput').click()">📥 Khôi phục (JSON/Excel)</button>
+            <input type="file" id="fileInput" accept=".json, .xlsx, .xls" style="display:none;" onchange="handleImport(event)">
+            <button class="btn btn-success" onclick="exportExcel()">📊 Xuất File Excel</button>
+        </div>
+    </header>
+
+    <div class="main-grid">
+        <div class="card no-print">
+            <h3 id="formTitle">➕ Tạo Đơn Bảo Hành</h3>
+            <form id="bhForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Nơi nhận bảo hành</label>
+                    <input type="text" id="toLoc" list="partnerList" placeholder="Tên công ty nhận BH..." required>
+                    <datalist id="partnerList"></datalist>
+                </div>
+                <div class="form-group">
+                    <label>Khách hàng (Tên & SĐT)</label>
+                    <input type="text" id="custInfo" placeholder="VD: Anh Tuấn - 0908123456" required>
+                </div>
+                <div class="form-group">
+                    <label>Sản phẩm lỗi</label>
+                    <input type="text" id="prodName" placeholder="Tên sản phẩm" required style="margin-bottom:8px;">
+                    <input type="text" id="prodSerial" placeholder="Số Serial / IMEI">
+                </div>
+                <div class="form-group">
+                    <label>Tình trạng lỗi</label>
+                    <textarea id="prodIssue" rows="2" placeholder="Mô tả lỗi..."></textarea>
+                </div>
+                <div class="loan-banner">
+                    <label style="color: #9a3412;">🎁 Đồ cho khách mượn</label>
+                    <input type="text" id="loanItem" placeholder="Linh kiện cho mượn tạm">
+                </div>
+                <div class="btn-group">
+                    <button type="submit" id="submitBtn" class="btn btn-primary" style="flex:1; justify-content:center;">💾 LƯU THÔNG TIN</button>
+                    <button type="button" id="cancelBtn" class="btn btn-outline" style="display:none;" onclick="resetForm()">Hủy</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;" class="no-print">
+                <input type="text" id="searchBox" placeholder="Tìm tên khách, số máy, đồ mượn..." onkeyup="render()" style="max-width:350px;">
+                <select id="filterStatus" onchange="render()" style="width:180px;">
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="0">Chờ gửi đi</option>
+                    <option value="1">Đang bảo hành</option>
+                    <option value="2">Đã sửa xong</option>
+                    <option value="3">Đã xong đơn</option>
+                    <option value="loan">Chưa trả đồ</option>
+                </select>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ngày</th>
+                            <th>Khách & Sản phẩm</th>
+                            <th>Nơi BH</th>
+                            <th>Đồ mượn</th>
+                            <th>Trạng thái</th>
+                            <th class="no-print">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mẫu in phiếu -->
+<div id="printTicket">
+    <div style="text-align:center; border-bottom:1px solid #000; padding-bottom:10px;">
+        <h2>MÁY TÍNH NHƠN TRẠCH</h2>
+        <p>Phiếu Tiếp Nhận Bảo Hành</p>
+    </div>
+    <div id="printContent" style="padding:20px 0;"></div>
+    <div style="display:flex; justify-content:space-between; margin-top:30px;">
+        <div style="text-align:center; width:45%;">Khách hàng<br><br><br>...</div>
+        <div style="text-align:center; width:45%;">Nhân viên<br><br><br>...</div>
+    </div>
+</div>
+
+<script>
+    let db = JSON.parse(localStorage.getItem('nt_v6_db') || '[]');
+    let partners = JSON.parse(localStorage.getItem('nt_v6_partners') || '["Vi tính Nguyễn Thắng"]');
+
+    function save() {
+        localStorage.setItem('nt_v6_db', JSON.stringify(db));
+        localStorage.setItem('nt_v6_partners', JSON.stringify(partners));
+        render();
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 2000);
+    }
+
+    function copyText(text) {
+        // Trích xuất số điện thoại nếu chuỗi có định dạng "Tên - SĐT"
+        let cleanText = text;
+        const phoneMatch = text.match(/\d{9,11}/);
+        if (phoneMatch) cleanText = phoneMatch[0];
+
+        navigator.clipboard.writeText(cleanText);
+        showToast('Đã copy: ' + cleanText);
+    }
+
+    const form = document.getElementById('bhForm');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const editId = document.getElementById('editId').value;
+        const toLoc = document.getElementById('toLoc').value;
+
+        const data = {
+            id: editId ? parseInt(editId) : Date.now(),
+            date: editId ? db.find(x => x.id == editId).date : new Date().toLocaleDateString('vi-VN'),
+            customer: document.getElementById('custInfo').value,
+            product: document.getElementById('prodName').value,
+            serial: document.getElementById('prodSerial').value,
+            issue: document.getElementById('prodIssue').value,
+            to: toLoc,
+            loanItem: document.getElementById('loanItem').value,
+            loanReturned: editId ? db.find(x => x.id == editId).loanReturned : false,
+            status: editId ? db.find(x => x.id == editId).status : 0
+        };
+
+        if (editId) {
+            const idx = db.findIndex(i => i.id == editId);
+            db[idx] = data;
+        } else {
+            db.unshift(data);
+        }
+
+        if(!partners.includes(toLoc)) partners.push(toLoc);
+        save();
+        resetForm();
+    });
+
+    function resetForm() {
+        form.reset();
+        document.getElementById('editId').value = '';
+        document.getElementById('formTitle').innerText = '➕ Tạo Đơn Bảo Hành';
+        document.getElementById('submitBtn').innerText = '💾 LƯU THÔNG TIN';
+        document.getElementById('cancelBtn').style.display = 'none';
+    }
+
+    function editItem(id) {
+        const item = db.find(i => i.id === id);
+        document.getElementById('editId').value = item.id;
+        document.getElementById('toLoc').value = item.to;
+        document.getElementById('custInfo').value = item.customer;
+        document.getElementById('prodName').value = item.product;
+        document.getElementById('prodSerial').value = item.serial;
+        document.getElementById('prodIssue').value = item.issue;
+        document.getElementById('loanItem').value = item.loanItem;
+        document.getElementById('formTitle').innerText = '📝 Sửa Thông Tin';
+        document.getElementById('submitBtn').innerText = 'CẬP NHẬT';
+        document.getElementById('cancelBtn').style.display = 'inline-block';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function render() {
+        const tbody = document.getElementById('tableBody');
+        const search = document.getElementById('searchBox').value.toLowerCase();
+        const filter = document.getElementById('filterStatus').value;
+        tbody.innerHTML = '';
+        
+        let loanCount = 0;
+        const filtered = db.filter(i => {
+            const mS = i.customer.toLowerCase().includes(search) || i.product.toLowerCase().includes(search) || (i.serial && i.serial.toLowerCase().includes(search));
+            let mF = filter === 'loan' ? (i.loanItem && !i.loanReturned) : (filter === 'all' || i.status == filter);
+            return mS && mF;
+        });
+
+        filtered.forEach(item => {
+            if(item.loanItem && !item.loanReturned) loanCount++;
+            tbody.innerHTML += `
+                <tr>
+                    <td style="font-size:12px; color:#64748b;">${item.date}</td>
+                    <td>
+                        <div style="font-weight:700;">${item.customer} <span class="copy-btn no-print" onclick="copyText('${item.customer}')">📋 Copy SĐT</span></div>
+                        <div style="color:var(--primary); font-size:13px; margin-top:3px;">${item.product}</div>
+                        ${item.serial ? `<div style="font-size:11px; color:#94a3b8;">SN: ${item.serial} <span class="copy-btn no-print" onclick="copyText('${item.serial}')">📋 Copy SN</span></div>` : ''}
+                    </td>
+                    <td>${item.to}</td>
+                    <td>
+                        <span class="${item.loanReturned ? 'returned' : 'loan-item'}">${item.loanItem || '-'}</span>
+                        ${(item.loanItem && !item.loanReturned) ? `<br><button class="btn no-print" onclick="toggleLoan(${item.id})" style="font-size:10px; padding:2px 5px; margin-top:5px;">Thu hồi</button>` : ''}
+                    </td>
+                    <td>
+                        <select onchange="changeStatus(${item.id}, this.value)" class="badge status-${item.status}">
+                            <option value="0" ${item.status==0?'selected':''}>Chờ gửi</option>
+                            <option value="1" ${item.status==1?'selected':''}>Đang BH</option>
+                            <option value="2" ${item.status==2?'selected':''}>Đã xong</option>
+                            <option value="3" ${item.status==3?'selected':''}>Đã trả khách</option>
+                        </select>
+                    </td>
+                    <td class="no-print">
+                        <div class="btn-group">
+                            <button class="btn btn-outline" onclick="printTicket(${item.id})" title="In phiếu">🖨️</button>
+                            <button class="btn btn-outline" onclick="editItem(${item.id})" title="Sửa">✏️</button>
+                            <button class="btn btn-danger" onclick="deleteItem(${item.id})" title="Xóa">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        document.getElementById('countTotal').innerText = db.length;
+        document.getElementById('countLoan').innerText = loanCount;
+        const dl = document.getElementById('partnerList');
+        dl.innerHTML = partners.map(p => `<option value="${p}">`).join('');
+    }
+
+    function toggleLoan(id) {
+        const idx = db.findIndex(i => i.id === id);
+        db[idx].loanReturned = true;
+        save();
+    }
+
+    function changeStatus(id, val) {
+        const idx = db.findIndex(i => i.id === id);
+        db[idx].status = parseInt(val);
+        save();
+    }
+
+    function deleteItem(id) {
+        if(confirm('Xóa đơn này?')) {
+            db = db.filter(i => i.id !== id);
+            save();
+        }
+    }
+
+    function printTicket(id) {
+        const item = db.find(i => i.id === id);
+        document.getElementById('printContent').innerHTML = `
+            <p><strong>Khách hàng:</strong> ${item.customer}</p>
+            <p><strong>Ngày nhận:</strong> ${item.date}</p>
+            <p><strong>Thiết bị:</strong> ${item.product}</p>
+            <p><strong>Số Serial:</strong> ${item.serial || '...'}</p>
+            <p><strong>Tình trạng:</strong> ${item.issue}</p>
+            ${item.loanItem ? `<p><strong>Đồ cho mượn:</strong> ${item.loanItem}</p>` : ''}
+        `;
+        window.print();
+    }
+
+    function exportJSON() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+        const dl = document.createElement('a');
+        dl.setAttribute("href", dataStr);
+        dl.setAttribute("download", "Backup_BaoHanh.json");
+        dl.click();
+    }
+
+    function exportExcel() {
+        const data = db.map(i => ({
+            "NGÀY NHẬN": i.date,
+            "KHÁCH HÀNG": i.customer,
+            "SẢN PHẨM": i.product,
+            "SỐ SERIAL": i.serial,
+            "MÔ TẢ LỖI": i.issue,
+            "NƠI BẢO HÀNH": i.to,
+            "THIẾT BỊ MƯỢN": i.loanItem,
+            "TRẠNG THÁI MƯỢN": i.loanItem ? (i.loanReturned ? "Đã trả" : "CHƯA TRẢ") : "",
+            "TRẠNG THÁI BH": i.status == 0 ? "Chờ gửi" : i.status == 1 ? "Đang BH" : i.status == 2 ? "Đã xong" : "Đã lấy"
+        }));
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "BaoHanh");
+        XLSX.writeFile(wb, "DS_BaoHanh_NhonTrach.xlsx");
+    }
+
+    function handleImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        if (file.name.endsWith('.json')) {
+            reader.onload = (e) => {
+                try {
+                    db = JSON.parse(e.target.result);
+                    save();
+                    alert('Khôi phục JSON thành công!');
+                } catch(err) { alert('File JSON lỗi!'); }
+            };
+            reader.readAsText(file);
+        } else {
+            reader.onload = (e) => {
+                const workbook = XLSX.read(e.target.result, {type: 'binary'});
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet);
+                
+                if(confirm(`Tìm thấy ${rows.length} đơn. Khôi phục ngay?`)) {
+                    db = rows.map((r, idx) => ({
+                        id: Date.now() + idx,
+                        date: r["NGÀY NHẬN"] || new Date().toLocaleDateString('vi-VN'),
+                        customer: r["KHÁCH HÀNG"] || "Chưa rõ",
+                        product: r["SẢN PHẨM"] || "Chưa rõ",
+                        serial: r["SỐ SERIAL"] || "",
+                        issue: r["MÔ TẢ LỖI"] || "",
+                        to: r["NƠI BẢO HÀNH"] || "",
+                        loanItem: r["THIẾT BỊ MƯỢN"] || "",
+                        loanReturned: r["TRẠNG THÁI MƯỢN"] === "Đã trả",
+                        status: r["TRẠNG THÁI BH"] === "Đang BH" ? 1 : r["TRẠNG THÁI BH"] === "Đã xong" ? 2 : r["TRẠNG THÁI BH"] === "Đã lấy" ? 3 : 0
+                    }));
+                    save();
+                }
+            };
+            reader.readAsBinaryString(file);
+        }
+    }
+
+    render();
+</script>
+</body>
+</html>

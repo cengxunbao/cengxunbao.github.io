@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Bảo Hành - Nhơn Trạch v6.0</title>
+    <title>Quản Lý Bảo Hành -NHƠN TRẠCH</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary: #4f46e5; --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
-            --dark: #1e293b; --light: #f8fafc; --border: #e2e8f0; --purple: #8b5cf6;
+            --dark: #1e293b; --light: #f8fafc; --border: #e2e8f0; --purple: #8b5cf6; --cloud: #0ea5e9;
         }
         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #334155; }
         .container { max-width: 1500px; margin: auto; }
 
-        /* Header */
         header { 
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%); 
             color: white; padding: 25px; border-radius: 16px; margin-bottom: 25px; 
@@ -25,14 +24,12 @@
         .stat-card span { display: block; font-size: 22px; font-weight: 800; }
         .stat-card label { font-size: 11px; text-transform: uppercase; opacity: 0.8; }
 
-        /* Grid */
         .main-grid { display: grid; grid-template-columns: 360px 1fr; gap: 25px; }
         @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } }
 
         .card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         h3 { margin: 0 0 20px 0; font-size: 18px; color: var(--dark); }
 
-        /* Form */
         .form-group { margin-bottom: 16px; }
         label { display: block; font-weight: 600; font-size: 12px; color: #64748b; margin-bottom: 6px; text-transform: uppercase; }
         input, select, textarea { 
@@ -41,27 +38,22 @@
         }
         .loan-banner { background: #fff7ed; border: 1px solid #fed7aa; padding: 15px; border-radius: 12px; border-left: 4px solid var(--warning); margin: 20px 0; }
 
-        /* Buttons */
         .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn { padding: 10px 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
+        .btn-cloud { background: var(--cloud); color: white; }
         .btn-outline { background: white; border: 1px solid var(--border); color: var(--dark); }
 
-        /* Table */
         table { width: 100%; border-collapse: separate; border-spacing: 0; }
         th { background: #f8fafc; padding: 14px; text-align: left; font-size: 12px; color: #64748b; border-bottom: 2px solid #f1f5f9; }
         td { padding: 16px 14px; border-bottom: 1px solid #f1f5f9; font-size: 14px; vertical-align: top; }
         
-        /* Copy Badge */
         .copy-btn { 
             display: inline-flex; align-items: center; background: #f1f5f9; border: 1px solid #e2e8f0; 
             padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; margin-left: 5px; color: #475569;
         }
-        .copy-btn:hover { background: var(--primary); color: white; }
-
-        /* Status */
         .badge { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; border: none; }
         .status-0 { background: #fee2e2; color: #dc2626; }
         .status-1 { background: #fef3c7; color: #d97706; }
@@ -71,32 +63,32 @@
         .loan-item { color: var(--purple); font-weight: 700; }
         .returned { text-decoration: line-through; opacity: 0.5; }
 
-        /* Custom alert */
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 10px 20px; border-radius: 30px; font-size: 13px; display: none; z-index: 1000; box-shadow: 0 10px 15px rgba(0,0,0,0.2); }
+        #cloudStatus { font-size: 12px; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.1); display: flex; align-items: center; gap: 5px; }
+        .loading-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 10px 20px; border-radius: 30px; font-size: 13px; display: none; z-index: 1000; box-shadow: 0 10px 15px rgba(0,0,0,0.2); }
         @media print { .no-print { display: none !important; } #printTicket { display: block !important; } }
         #printTicket { display: none; font-family: sans-serif; }
     </style>
 </head>
 <body>
 
-<div id="toast">Đã sao chép!</div>
+<div id="toast">Thông báo</div>
 
 <div class="container">
     <header class="no-print">
         <div>
             <h1 style="margin:0; font-size: 22px;">MÁY TÍNH NHƠN TRẠCH</h1>
-            <p style="margin:5px 0 0; opacity: 0.7; font-size: 12px;">Hệ thống quản lý bảo hành chuyên nghiệp</p>
+            <div id="cloudStatus"><div class="loading-dot" id="cloudDot"></div> <span id="cloudMsg">Đang kết nối Cloud...</span></div>
         </div>
         <div class="stats-group">
             <div class="stat-card"><label>Tổng đơn</label><span id="countTotal">0</span></div>
             <div class="stat-card" style="color: #fbbf24;"><label>Đang mượn</label><span id="countLoan">0</span></div>
         </div>
         <div class="btn-group">
-            <button class="btn btn-outline" onclick="exportJSON()">📤 Xuất JSON</button>
-            <button class="btn btn-outline" onclick="document.getElementById('fileInput').click()">📥 Khôi phục (JSON/Excel)</button>
-            <input type="file" id="fileInput" accept=".json, .xlsx, .xls" style="display:none;" onchange="handleImport(event)">
-            <button class="btn btn-success" onclick="exportExcel()">📊 Xuất File Excel</button>
+            <button class="btn btn-cloud" onclick="restoreFromCloud()">🔄 Tải lại dữ liệu</button>
+            <button class="btn btn-outline" onclick="exportExcel()">📊 Xuất Excel</button>
         </div>
     </header>
 
@@ -128,7 +120,7 @@
                     <input type="text" id="loanItem" placeholder="Linh kiện cho mượn tạm">
                 </div>
                 <div class="btn-group">
-                    <button type="submit" id="submitBtn" class="btn btn-primary" style="flex:1; justify-content:center;">💾 LƯU THÔNG TIN</button>
+                    <button type="submit" id="submitBtn" class="btn btn-primary" style="flex:1; justify-content:center;">💾 LƯU & ĐỒNG BỘ</button>
                     <button type="button" id="cancelBtn" class="btn btn-outline" style="display:none;" onclick="resetForm()">Hủy</button>
                 </div>
             </form>
@@ -136,7 +128,7 @@
 
         <div class="card">
             <div style="display:flex; justify-content:space-between; margin-bottom:20px;" class="no-print">
-                <input type="text" id="searchBox" placeholder="Tìm tên khách, số máy, đồ mượn..." onkeyup="render()" style="max-width:350px;">
+                <input type="text" id="searchBox" placeholder="Tìm kiếm..." onkeyup="render()" style="max-width:350px;">
                 <select id="filterStatus" onchange="render()" style="width:180px;">
                     <option value="all">Tất cả trạng thái</option>
                     <option value="0">Chờ gửi đi</option>
@@ -165,27 +157,90 @@
     </div>
 </div>
 
-<!-- Mẫu in phiếu -->
 <div id="printTicket">
     <div style="text-align:center; border-bottom:1px solid #000; padding-bottom:10px;">
         <h2>MÁY TÍNH NHƠN TRẠCH</h2>
         <p>Phiếu Tiếp Nhận Bảo Hành</p>
     </div>
     <div id="printContent" style="padding:20px 0;"></div>
-    <div style="display:flex; justify-content:space-between; margin-top:30px;">
-        <div style="text-align:center; width:45%;">Khách hàng<br><br><br>...</div>
-        <div style="text-align:center; width:45%;">Nhân viên<br><br><br>...</div>
-    </div>
 </div>
 
 <script>
+    // CẤU HÌNH CỐ ĐỊNH CỦA BẠN
+    const CLOUD_CONFIG = {
+        token: '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',
+        gistId: 'a18fa5445cddb3cb337b3c7a74339f6f'
+    };
+
     let db = JSON.parse(localStorage.getItem('nt_v6_db') || '[]');
     let partners = JSON.parse(localStorage.getItem('nt_v6_partners') || '["Vi tính Nguyễn Thắng"]');
 
-    function save() {
+    // Tự động tải dữ liệu khi mở trang
+    window.onload = () => {
+        restoreFromCloud();
+    };
+
+    async function save() {
         localStorage.setItem('nt_v6_db', JSON.stringify(db));
         localStorage.setItem('nt_v6_partners', JSON.stringify(partners));
         render();
+        // Tự động Backup lên Cloud mỗi khi lưu
+        await backupToCloud();
+    }
+
+    function updateCloudUI(status, msg) {
+        const dot = document.getElementById('cloudDot');
+        const text = document.getElementById('cloudMsg');
+        text.innerText = msg;
+        if(status === 'loading') dot.style.background = '#f59e0b';
+        if(status === 'success') dot.style.background = '#10b981';
+        if(status === 'error') dot.style.background = '#ef4444';
+    }
+
+    async function backupToCloud() {
+        updateCloudUI('loading', 'Đang đồng bộ lên mây...');
+        const data = {
+            files: {
+                "baohanh_db.json": { content: JSON.stringify(db) },
+                "partners_db.json": { content: JSON.stringify(partners) }
+            }
+        };
+
+        try {
+            const res = await fetch(`https://api.github.com/gists/${CLOUD_CONFIG.gistId}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `token ${CLOUD_CONFIG.token}` },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) {
+                updateCloudUI('success', 'Đã đồng bộ lên mây');
+            } else {
+                updateCloudUI('error', 'Lỗi đồng bộ!');
+            }
+        } catch (err) {
+            updateCloudUI('error', 'Mất kết nối Cloud');
+        }
+    }
+
+    async function restoreFromCloud() {
+        updateCloudUI('loading', 'Đang tải dữ liệu từ mây...');
+        try {
+            const res = await fetch(`https://api.github.com/gists/${CLOUD_CONFIG.gistId}`, {
+                headers: { 'Authorization': `token ${CLOUD_CONFIG.token}` }
+            });
+            const result = await res.json();
+            if (res.ok) {
+                db = JSON.parse(result.files["baohanh_db.json"].content);
+                partners = JSON.parse(result.files["partners_db.json"].content);
+                localStorage.setItem('nt_v6_db', JSON.stringify(db));
+                localStorage.setItem('nt_v6_partners', JSON.stringify(partners));
+                render();
+                updateCloudUI('success', 'Dữ liệu mới nhất');
+                showToast('Đã tải dữ liệu từ Cloud!');
+            }
+        } catch (err) {
+            updateCloudUI('error', 'Không thể tải dữ liệu');
+        }
     }
 
     function showToast(msg) {
@@ -196,11 +251,9 @@
     }
 
     function copyText(text) {
-        // Trích xuất số điện thoại nếu chuỗi có định dạng "Tên - SĐT"
         let cleanText = text;
         const phoneMatch = text.match(/\d{9,11}/);
         if (phoneMatch) cleanText = phoneMatch[0];
-
         navigator.clipboard.writeText(cleanText);
         showToast('Đã copy: ' + cleanText);
     }
@@ -240,7 +293,7 @@
         form.reset();
         document.getElementById('editId').value = '';
         document.getElementById('formTitle').innerText = '➕ Tạo Đơn Bảo Hành';
-        document.getElementById('submitBtn').innerText = '💾 LƯU THÔNG TIN';
+        document.getElementById('submitBtn').innerText = '💾 LƯU & ĐỒNG BỘ';
         document.getElementById('cancelBtn').style.display = 'none';
     }
 
@@ -254,7 +307,7 @@
         document.getElementById('prodIssue').value = item.issue;
         document.getElementById('loanItem').value = item.loanItem;
         document.getElementById('formTitle').innerText = '📝 Sửa Thông Tin';
-        document.getElementById('submitBtn').innerText = 'CẬP NHẬT';
+        document.getElementById('submitBtn').innerText = 'CẬP NHẬT & ĐỒNG BỘ';
         document.getElementById('cancelBtn').style.display = 'inline-block';
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
@@ -276,11 +329,11 @@
             if(item.loanItem && !item.loanReturned) loanCount++;
             tbody.innerHTML += `
                 <tr>
-                    <td style="font-size:12px; color:#64748b;">${item.date}</td>
+                    <td style="font-size:11px;">${item.date}</td>
                     <td>
-                        <div style="font-weight:700;">${item.customer} <span class="copy-btn no-print" onclick="copyText('${item.customer}')">📋 Copy SĐT</span></div>
+                        <div style="font-weight:700;">${item.customer} <span class="copy-btn no-print" onclick="copyText('${item.customer}')">📋</span></div>
                         <div style="color:var(--primary); font-size:13px; margin-top:3px;">${item.product}</div>
-                        ${item.serial ? `<div style="font-size:11px; color:#94a3b8;">SN: ${item.serial} <span class="copy-btn no-print" onclick="copyText('${item.serial}')">📋 Copy SN</span></div>` : ''}
+                        ${item.serial ? `<div style="font-size:11px; color:#94a3b8;">SN: ${item.serial} <span class="copy-btn no-print" onclick="copyText('${item.serial}')">📋</span></div>` : ''}
                     </td>
                     <td>${item.to}</td>
                     <td>
@@ -297,9 +350,9 @@
                     </td>
                     <td class="no-print">
                         <div class="btn-group">
-                            <button class="btn btn-outline" onclick="printTicket(${item.id})" title="In phiếu">🖨️</button>
-                            <button class="btn btn-outline" onclick="editItem(${item.id})" title="Sửa">✏️</button>
-                            <button class="btn btn-danger" onclick="deleteItem(${item.id})" title="Xóa">🗑️</button>
+                            <button class="btn btn-outline" onclick="printTicket(${item.id})">🖨️</button>
+                            <button class="btn btn-outline" onclick="editItem(${item.id})">✏️</button>
+                            <button class="btn btn-danger" onclick="deleteItem(${item.id})">🗑️</button>
                         </div>
                     </td>
                 </tr>
@@ -307,8 +360,7 @@
         });
         document.getElementById('countTotal').innerText = db.length;
         document.getElementById('countLoan').innerText = loanCount;
-        const dl = document.getElementById('partnerList');
-        dl.innerHTML = partners.map(p => `<option value="${p}">`).join('');
+        document.getElementById('partnerList').innerHTML = partners.map(p => `<option value="${p}">`).join('');
     }
 
     function toggleLoan(id) {
@@ -324,7 +376,7 @@
     }
 
     function deleteItem(id) {
-        if(confirm('Xóa đơn này?')) {
+        if(confirm('Xóa đơn này và đồng bộ lên mây?')) {
             db = db.filter(i => i.id !== id);
             save();
         }
@@ -343,70 +395,15 @@
         window.print();
     }
 
-    function exportJSON() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-        const dl = document.createElement('a');
-        dl.setAttribute("href", dataStr);
-        dl.setAttribute("download", "Backup_BaoHanh.json");
-        dl.click();
-    }
-
     function exportExcel() {
         const data = db.map(i => ({
-            "NGÀY NHẬN": i.date,
-            "KHÁCH HÀNG": i.customer,
-            "SẢN PHẨM": i.product,
-            "SỐ SERIAL": i.serial,
-            "MÔ TẢ LỖI": i.issue,
-            "NƠI BẢO HÀNH": i.to,
-            "THIẾT BỊ MƯỢN": i.loanItem,
-            "TRẠNG THÁI MƯỢN": i.loanItem ? (i.loanReturned ? "Đã trả" : "CHƯA TRẢ") : "",
-            "TRẠNG THÁI BH": i.status == 0 ? "Chờ gửi" : i.status == 1 ? "Đang BH" : i.status == 2 ? "Đã xong" : "Đã lấy"
+            "NGÀY": i.date, "KHÁCH HÀNG": i.customer, "SẢN PHẨM": i.product, "Serial": i.serial,
+            "NƠI NHẬN BH": i.to, "ĐỒ MƯỢN": i.loanItem, "TRẠNG THÁI": i.status == 3 ? "Xong" : "Đang xử lý"
         }));
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "BaoHanh");
-        XLSX.writeFile(wb, "DS_BaoHanh_NhonTrach.xlsx");
-    }
-
-    function handleImport(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        if (file.name.endsWith('.json')) {
-            reader.onload = (e) => {
-                try {
-                    db = JSON.parse(e.target.result);
-                    save();
-                    alert('Khôi phục JSON thành công!');
-                } catch(err) { alert('File JSON lỗi!'); }
-            };
-            reader.readAsText(file);
-        } else {
-            reader.onload = (e) => {
-                const workbook = XLSX.read(e.target.result, {type: 'binary'});
-                const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                const rows = XLSX.utils.sheet_to_json(sheet);
-                
-                if(confirm(`Tìm thấy ${rows.length} đơn. Khôi phục ngay?`)) {
-                    db = rows.map((r, idx) => ({
-                        id: Date.now() + idx,
-                        date: r["NGÀY NHẬN"] || new Date().toLocaleDateString('vi-VN'),
-                        customer: r["KHÁCH HÀNG"] || "Chưa rõ",
-                        product: r["SẢN PHẨM"] || "Chưa rõ",
-                        serial: r["SỐ SERIAL"] || "",
-                        issue: r["MÔ TẢ LỖI"] || "",
-                        to: r["NƠI BẢO HÀNH"] || "",
-                        loanItem: r["THIẾT BỊ MƯỢN"] || "",
-                        loanReturned: r["TRẠNG THÁI MƯỢN"] === "Đã trả",
-                        status: r["TRẠNG THÁI BH"] === "Đang BH" ? 1 : r["TRẠNG THÁI BH"] === "Đã xong" ? 2 : r["TRẠNG THÁI BH"] === "Đã lấy" ? 3 : 0
-                    }));
-                    save();
-                }
-            };
-            reader.readAsBinaryString(file);
-        }
+        XLSX.writeFile(wb, "BaoHanh_NhonTrach.xlsx");
     }
 
     render();

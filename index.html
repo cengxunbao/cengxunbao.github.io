@@ -92,7 +92,7 @@
         .page { display: none; }
         .page.active { display: block; }
 
-        /* PHẦN CSS IN ĐÃ THAY ĐỔI */
+        /* PRINT STYLES */
         #receipt-print { display: none; }
 
         @media print {
@@ -114,56 +114,15 @@
             border-radius: 12px;
         }
 
-        .receipt-header {
-            text-align: center;
-            margin-bottom: 12px;
-        }
-
-        .receipt-header h2 {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        .receipt-header small {
-            font-size: 11px;
-            color: #555;
-        }
-
-        .receipt-title {
-            text-align: center;
-            font-weight: 800;
-            margin: 10px 0;
-            font-size: 14px;
-            text-transform: uppercase;
-        }
-
-        .receipt-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            font-size: 13px;
-        }
-
-        .receipt-row span:first-child {
-            font-weight: 600;
-        }
-
-        .receipt-divider {
-            border-top: 1px dashed #000;
-            margin: 10px 0;
-        }
-
-        .receipt-footer {
-            text-align: center;
-            margin-top: 12px;
-            font-size: 11px;
-        }
-
-        .receipt-footer img {
-            margin: 10px auto;
-            display: block;
-        }
+        .receipt-header { text-align: center; margin-bottom: 12px; }
+        .receipt-header h2 { font-size: 20px; font-weight: 800; letter-spacing: 1px; }
+        .receipt-header small { font-size: 11px; color: #555; }
+        .receipt-title { text-align: center; font-weight: 800; margin: 10px 0; font-size: 14px; text-transform: uppercase; }
+        .receipt-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+        .receipt-row span:first-child { font-weight: 600; }
+        .receipt-divider { border-top: 1px dashed #000; margin: 10px 0; }
+        .receipt-footer { text-align: center; margin-top: 12px; font-size: 11px; }
+        .receipt-footer img { margin: 10px auto; display: block; }
 
         /* LOGIN MODAL */
         #login-overlay {
@@ -247,7 +206,7 @@
                 </div>
                 <form id="form-bh">
                     <input type="hidden" id="bh-id">
-                    <div class="group"><label>Nơi gửi bảo hành</label><input type="text" id="bh-to" required></div>
+                    <div class="group"><label>Nơi gửi bảo hành</label><input type="text" id="bh-to" placeholder="VD: Viết Sơn, Thủy Linh..." required></div>
                     <div class="group"><label>Khách hàng (Tên & SĐT)</label><input type="text" id="bh-cust" required></div>
                     <div class="group"><label>Linh kiện & SN</label>
                         <input type="text" id="bh-prod" placeholder="Tên linh kiện" required>
@@ -262,7 +221,16 @@
             </div>
             <div class="table-container">
                 <table>
-                    <thead><tr><th>Ngày nhận</th><th>Khách / Linh kiện</th><th>Mượn</th><th style="width:120px">Trạng thái</th><th>Thao tác</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Ngày nhận</th>
+                            <th>Khách / Linh kiện</th>
+                            <th>Nơi gửi</th> <!-- CỘT MỚI -->
+                            <th>Mượn</th>
+                            <th style="width:120px">Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
                     <tbody id="tbody-bh"></tbody>
                 </table>
             </div>
@@ -299,20 +267,16 @@
     </div>
 </main>
 
-<!-- PHẦN HTML IN ĐÃ THAY ĐỔI -->
+<!-- PHẦN IN PHIẾU -->
 <div id="receipt-print">
     <div class="receipt-card">
         <div class="receipt-header">
             <h2>PC NHƠN TRẠCH PRO</h2>
             <small>Nhận sửa chữa & bảo hành linh kiện</small>
         </div>
-
         <div class="receipt-title" id="receipt-type"></div>
-
         <div id="receipt-content"></div>
-
         <div class="receipt-divider"></div>
-
         <div class="receipt-footer">
             <img id="qr-code" width="160" height="160">
             <div>Cảm ơn quý khách đã tin tưởng ❤️</div>
@@ -326,7 +290,6 @@
     let db_bh = JSON.parse(localStorage.getItem('db_bh') || '[]');
     let db_sc = JSON.parse(localStorage.getItem('db_sc') || '[]');
     let searchTerm = "";
-
     let pendingDelete = { type: null, id: null };
 
     function notify(msg, color = '#6366f1') {
@@ -467,7 +430,7 @@
         const today = new Date().toLocaleDateString('vi-VN');
 
         let fBH = db_bh.sort((a,b) => parseDate(b.date) - parseDate(a.date)).filter(i => {
-            const matchSearch = (String(i.customer) + String(i.product) + String(i.id) + String(i.serial)).toLowerCase().includes(searchTerm);
+            const matchSearch = (String(i.customer) + String(i.product) + String(i.id) + String(i.serial) + String(i.to)).toLowerCase().includes(searchTerm);
             const matchStatus = fVal === "all" ? true : (fVal === "overdue" ? isOverdue(i.date, i.status) : i.status == fVal);
             return matchSearch && matchStatus;
         });
@@ -483,6 +446,7 @@
                     <b>${i.customer}</b> <i class="ph ph-copy copy-tag" onclick="copy('${i.customer}','tên khách')"></i><br>
                     ${i.product} ${i.serial ? `<br><small style="color:#64748b">SN: ${i.serial}</small> <i class="ph ph-copy copy-tag" onclick="copy('${i.serial}','Số Serial')"></i>` : ''}
                 </td>
+                <td><span style="color:var(--primary); font-weight:600">${i.to || '-'}</span></td> <!-- HIỂN THỊ NƠI GỬI -->
                 <td>${i.loanItem ? `<span style="background:var(--accent); color:white; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:bold">${i.loanItem}</span>` : '-'}</td>
                 <td>
                     <select onchange="updateSt('bh','${i.id}',this.value)" class="status st-${i.status}">
@@ -560,7 +524,6 @@
         notify("Đã tải dữ liệu lên form sửa");
     }
 
-    /* HÀM IN MỚI ĐÃ THAY ĐỔI */
     function printRec(type, id) {
         const item = type === 'bh'
             ? db_bh.find(x => x.id == id)
@@ -577,6 +540,8 @@
 
             <div class="receipt-row"><span>Khách hàng</span><span>${item.customer}</span></div>
             <div class="receipt-row"><span>Linh kiện</span><span>${type === 'bh' ? item.product : item.device}</span></div>
+            
+            ${type === 'bh' ? `<div class="receipt-row"><span>Nơi gửi BH</span><span>${item.to || '-'}</span></div>` : ''}
 
             ${type === 'bh'
                 ? `<div class="receipt-row"><span>Mượn đồ</span><span>${item.loanItem || 'Không'}</span></div>`

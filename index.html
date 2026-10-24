@@ -1,586 +1,648 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HỆ THỐNG PC NHƠN TRẠCH PRO</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary: #6366f1; --primary-light: #e0e7ff;
-            --secondary: #06b6d4; --accent: #f59e0b;
-            --success: #10b981; --danger: #ef4444;
-            --dark: #0f172a; --bg: #f1f5f9;
-            --card: #ffffff; --border: #e2e8f0;
-            --shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        }
-        * { box-sizing: border-box; font-family: 'Lexend', sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg); display: flex; color: var(--dark); height: 100vh; overflow: hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PC NHƠN TRẠCH PRO</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--p:#4f46e5;--p2:#06b6d4;--pl:#eef2ff;--acc:#f59e0b;--ok:#10b981;--bad:#ef4444;--ink:#0f172a;--mut:#64748b;--bg:#f1f5f9;--bd:#e2e8f0;--sh:0 1px 3px rgba(15,23,42,.06),0 8px 24px -8px rgba(15,23,42,.12)}
+*{box-sizing:border-box;font-family:'Lexend',sans-serif;margin:0;padding:0}
+body{background:var(--bg);display:flex;color:var(--ink);height:100vh;overflow:hidden}
+aside{width:250px;background:linear-gradient(180deg,#0f172a,#1e1b4b);color:#fff;padding:22px 14px;display:flex;flex-direction:column;flex-shrink:0}
+.logo{padding:16px;background:linear-gradient(135deg,var(--p),var(--p2));border-radius:16px;margin-bottom:26px;text-align:center;font-weight:800;font-size:16px;letter-spacing:.5px;box-shadow:0 8px 20px -6px rgba(79,70,229,.6)}
+.nav{padding:12px 14px;border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:6px;font-weight:500;font-size:14px;color:#a5b4fc;transition:.2s}
+.nav:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav.on{background:#fff;color:var(--p);font-weight:700}
+.nav b{margin-left:auto;font-size:11px;background:rgba(255,255,255,.15);padding:2px 8px;border-radius:20px}
+.nav.on b{background:var(--pl)}
+.side-foot{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
+.sync{display:flex;align-items:center;gap:8px;font-size:11px;color:#a5b4fc;margin-bottom:10px}
+.dot{width:8px;height:8px;border-radius:50%;background:#94a3b8}
+.dot.ok{background:var(--ok)}.dot.err{background:var(--bad)}.dot.busy{background:var(--acc);animation:bl 1s infinite}
+@keyframes bl{50%{opacity:.3}}
+main{flex:1;padding:22px;overflow-y:auto;scroll-behavior:smooth}
+.top{background:#fff;padding:16px 18px;border-radius:18px;box-shadow:var(--sh);margin-bottom:20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.search{flex:1;min-width:220px;position:relative}
+.search input{padding:12px 14px 12px 42px;border-radius:12px;background:#f8fafc}
+.search i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:19px}
+.search kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--mut);background:#fff;border:1px solid var(--bd);border-radius:6px;padding:2px 6px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+.chip{padding:7px 14px;border-radius:20px;border:1px solid var(--bd);background:#fff;font-size:12px;font-weight:600;color:var(--mut);cursor:pointer;transition:.2s}
+.chip:hover{border-color:var(--p);color:var(--p)}
+.chip.on{background:var(--p);border-color:var(--p);color:#fff}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:#fff;padding:16px 18px;border-radius:16px;box-shadow:var(--sh);border-left:4px solid var(--p)}
+.stat h4{font-size:11px;color:var(--mut);font-weight:600;margin-bottom:4px}
+.stat p{font-size:26px;font-weight:800}
+.layout{display:grid;grid-template-columns:330px 1fr;gap:20px;align-items:start}
+.card{background:#fff;padding:22px;border-radius:18px;box-shadow:var(--sh);position:sticky;top:0}
+.card h3{font-size:16px}
+.edit-badge{display:none;background:var(--pl);color:var(--p);font-size:11px;font-weight:700;padding:6px 10px;border-radius:8px;margin-bottom:12px}
+.editing .edit-badge{display:block}
+.g{margin-bottom:12px}
+label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin-bottom:5px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;font-size:13px;outline:none;background:#f8fafc;transition:.2s}
+input:focus,textarea:focus,select:focus{border-color:var(--p);background:#fff;box-shadow:0 0 0 3px rgba(79,70,229,.12)}
+.loan{background:#fffbeb;border:1px dashed var(--acc);padding:10px 12px;border-radius:12px}
+.loan label{color:#b45309}
+.tbl{background:#fff;border-radius:18px;overflow:auto;box-shadow:var(--sh)}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th{background:#f8fafc;padding:13px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--mut);border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid #f1f5f9;font-size:13px;vertical-align:top}
+tr:hover td{background:#fafaff}
+td small{color:#94a3b8}
+.empty{text-align:center;padding:50px 20px;color:var(--mut);font-size:13px}
+.empty i{font-size:42px;display:block;margin-bottom:8px;color:#cbd5e1}
+.st{padding:7px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none}
+.st0{background:#fee2e2;color:#dc2626}.st1{background:#fef3c7;color:#d97706}.st2{background:#dcfce7;color:#059669}
+.acts{display:flex;gap:6px}
+.ab{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:9px;border:none;cursor:pointer;background:#f1f5f9;color:var(--mut);transition:.2s;font-size:16px}
+.ab:hover{background:var(--p);color:#fff;transform:translateY(-2px)}
+.ab.del:hover{background:var(--bad)}
+.cp{color:var(--p);cursor:pointer;margin-left:4px;font-size:14px}
+.late{color:var(--bad);animation:bl 1s infinite;margin-right:4px}
+.tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-block}
+.tag.today{background:#dcfce7;color:#059669}
+.tag.lo{background:var(--acc);color:#fff;border:0;padding:3px 8px}
+.btn{padding:10px 16px;border-radius:11px;border:none;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.2s;font-size:13px}
+.btn:hover{transform:translateY(-1px)}
+.bp{background:linear-gradient(135deg,var(--p),#6366f1);color:#fff;box-shadow:0 6px 16px -6px rgba(79,70,229,.7)}
+.bg{background:#f1f5f9;color:var(--ink)}
+.side-foot .bg{background:rgba(255,255,255,.08);color:#e0e7ff;width:100%}
+.full{width:100%}
+#toasts{position:fixed;top:18px;right:18px;z-index:9999}
+.toast{background:#fff;border-left:5px solid var(--p);padding:13px 20px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.15);margin-bottom:10px;display:flex;align-items:center;gap:10px;animation:si .3s;font-weight:600;font-size:13px}
+@keyframes si{from{transform:translateX(100%);opacity:0}}
+.page{display:none}.page.on{display:block}
+#ov{position:fixed;inset:0;background:rgba(15,23,42,.65);display:none;align-items:center;justify-content:center;z-index:10001;backdrop-filter:blur(4px)}
+.lb{background:#fff;padding:28px;border-radius:20px;width:320px;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,.5)}
+#rp{display:none}
+.rc{width:380px;margin:0 auto;padding:20px 18px;border:2px solid #000;border-radius:12px;color:#000}
+.rh{text-align:center;margin-bottom:10px}.rh h2{font-size:20px;font-weight:800}.rh small{font-size:11px;color:#555}
+.rt{text-align:center;font-weight:800;margin:10px 0;font-size:14px}
+.rr{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:13px}
+.rr span:first-child{font-weight:600;white-space:nowrap}.rr span:last-child{text-align:right}
+.rd{border-top:1px dashed #000;margin:10px 0}
+.rf{text-align:center;margin-top:12px;font-size:11px}.rf img{margin:10px auto;display:block}
+a.tel{color:var(--ok);margin-left:4px;font-size:14px;text-decoration:none;vertical-align:middle}
+.tools{display:flex;gap:6px;margin-bottom:8px}.tools .btn{flex:1;padding:9px 0}
+.age{font-size:10px;font-weight:700;color:var(--mut)}.age.old{color:var(--bad)}
+[data-theme=dark]{--ink:#e2e8f0;--mut:#94a3b8;--bg:#0b1020;--bd:#273049;--pl:#1e1b4b;--sh:0 8px 24px -8px rgba(0,0,0,.6)}
+[data-theme=dark] :is(.top,.stat,.card,.tbl,.toast,.lb,.chip,.search kbd){background:#141b30;color:var(--ink)}
+[data-theme=dark] :is(input,select,textarea,th,.ab,.bg,.search input){background:#1a2340;color:var(--ink);border-color:var(--bd)}
+[data-theme=dark] td{border-color:var(--bd)}[data-theme=dark] tr:hover td{background:#18213b}
+[data-theme=dark] .loan{background:#2a2110}[data-theme=dark] .nav.on{background:#e0e7ff}
+[data-theme=dark] .chip.on{background:var(--p);color:#fff}
+@media print{html body{background:#fff!important}
+body{display:block;height:auto;overflow:visible}body>*:not(#rp){display:none!important}#rp{display:block}}
+@media(max-width:900px){
+body{flex-direction:column;height:auto;overflow:auto}
+aside{width:100%;flex-direction:row;align-items:center;padding:10px;gap:8px;overflow-x:auto}
+.logo{margin:0;padding:10px 14px;font-size:13px;white-space:nowrap}
+.nav{margin:0;white-space:nowrap}
+.side-foot{margin:0 0 0 auto;padding:0;border:0;display:flex;gap:8px;align-items:center}
+.sync span{display:none}
+.layout{grid-template-columns:1fr}.card{position:static}
+.stats{grid-template-columns:repeat(2,1fr)}
+main{padding:12px;overflow:visible}
+}
+#bnav,#sheet-bg{display:none}
+.sx{display:none}
+[data-theme=dark] #bnav{background:#141b30}
+[data-theme=dark] tbody tr{background:#141b30}
+@media print{body{padding:0!important}}
+@media(max-width:700px){
+body{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+body.sheet{overflow:hidden}
+aside{position:sticky;top:0;z-index:50;padding:8px 10px;gap:8px;overflow:visible;flex-wrap:nowrap}
+aside .nav{display:none}
+.logo{padding:8px 11px;font-size:11px;border-radius:12px;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.side-foot{margin-left:auto;gap:6px;flex-shrink:0}
+.side-foot .bg{width:auto}
+.sync{margin:0}
+.tools{margin:0}.tools .btn{padding:8px 10px}
+.side-foot>.btn{font-size:0;padding:8px 10px}
+.side-foot i.ph{font-size:18px}
+main{padding:10px}
+.top{padding:12px;gap:8px;border-radius:16px}
+.search{min-width:100%;order:-1}.search kbd{display:none}
+.top>.btn,.top>select{flex:1;padding:10px 8px;font-size:12px;min-width:0}
+.chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.chip{white-space:nowrap;flex:none}
+.stats{display:flex;overflow-x:auto;gap:10px;scrollbar-width:none;margin:0 -10px 14px;padding:0 10px}
+.stat{flex:none;min-width:132px;padding:12px 14px}
+.stat p{font-size:22px}
+input,select,textarea{font-size:16px}
+.st{font-size:13px;padding:9px 10px}
+.tbl{background:none;box-shadow:none;overflow:visible}
+table,tbody{display:block;width:100%;min-width:0}
+thead{display:none}
+tbody tr{display:grid;grid-template-columns:1fr auto;gap:8px 10px;background:#fff;border-radius:16px;box-shadow:var(--sh);padding:14px;margin-bottom:12px;border-left:4px solid var(--p)}
+tbody tr:hover td{background:none}
+td{padding:0;border:0;min-width:0}
+td[colspan]{grid-column:1/-1!important;grid-row:auto!important}
+td:nth-child(2){grid-column:1/-1}
+#tb-bh td:nth-child(1),#tb-sc td:nth-child(1){grid-column:1;grid-row:1}
+#tb-bh td:nth-child(5),#tb-sc td:nth-child(4){grid-column:2;grid-row:1;text-align:right}
+#tb-bh td:nth-child(3),#tb-bh td:nth-child(4),#tb-bh td:nth-child(6),#tb-sc td:nth-child(3),#tb-sc td:nth-child(5){grid-column:1/-1}
+#tb-bh td:nth-child(3)::before{content:'Nơi gửi: ';color:var(--mut);font-size:12px}
+#tb-bh td:nth-child(4)::before{content:'Mượn: ';color:var(--mut);font-size:12px}
+.acts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ab{width:100%;height:42px}
+.card{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:200;max-height:88vh;max-height:88dvh;overflow-y:auto;border-radius:22px 22px 0 0;padding:12px 18px calc(22px + env(safe-area-inset-bottom,0px));box-shadow:0 -12px 40px rgba(15,23,42,.3);transform:translateY(105%);visibility:hidden;transition:transform .28s ease,visibility 0s .28s}
+.card::before{content:'';display:block;width:42px;height:4px;border-radius:4px;background:var(--bd);margin:0 auto 12px}
+body.sheet .page.on .card{transform:none;visibility:visible;transition:transform .28s ease}
+.card .ab{width:38px;height:38px}
+.card>div:first-child{gap:8px;justify-content:flex-start!important}
+.card>div:first-child h3{margin-right:auto}
+.ab.sx{display:flex}
+#sheet-bg{display:block;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:150;opacity:0;pointer-events:none;transition:opacity .25s}
+body.sheet #sheet-bg{opacity:1;pointer-events:auto}
+#bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:100;background:#fff;border-top:1px solid var(--bd);padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));align-items:center;box-shadow:0 -8px 24px -12px rgba(15,23,42,.25)}
+#bnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--mut);padding:6px 0;cursor:pointer;position:relative}
+#bnav button i{font-size:24px}
+#bnav button.on{color:var(--p)}
+#bnav .fab{flex:none;width:58px;height:58px;margin:-30px 18px 0;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;justify-content:center;box-shadow:0 10px 24px -6px rgba(79,70,229,.7)}
+#bnav .fab i{font-size:28px}
+#bnav b{position:absolute;top:0;left:calc(50% + 8px);background:var(--bad);color:#fff;border-radius:10px;font-size:10px;min-width:17px;padding:1px 5px;text-align:center}
+#toasts{top:calc(62px + env(safe-area-inset-top,0px));left:12px;right:12px}
+.toast{margin-bottom:8px}
+}
 
-        /* SIDEBAR */
-        aside { width: 260px; background: var(--dark); color: white; padding: 25px 15px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .logo-box { padding: 15px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 15px; margin-bottom: 30px; text-align: center; font-weight: 800; font-size: 18px; }
-        
-        .nav-item { 
-            padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; 
-            margin-bottom: 8px; font-weight: 500; color: #94a3b8; transition: 0.3s;
-        }
-        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
-        .nav-item.active { background: var(--primary); color: white; }
-
-        /* MAIN & HEADER */
-        main { flex: 1; padding: 25px; overflow-y: auto; }
-        .top-header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; background: white; padding: 20px; border-radius: 15px; box-shadow: var(--shadow); }
-        .header-top-row { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
-        .header-filter-row { display: flex; gap: 10px; align-items: center; }
-
-        .search-box { flex: 1; position: relative; }
-        .search-box input { width: 100%; padding: 12px 15px 12px 45px; border-radius: 12px; border: 1px solid var(--border); background: #f8fafc; outline: none; font-size: 14px; }
-        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 20px; }
-
-        .filter-select { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 13px; font-weight: 600; cursor: pointer; }
-
-        /* STATS */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 20px; border-radius: 20px; box-shadow: var(--shadow); border-bottom: 4px solid var(--primary); }
-        .stat-card h4 { font-size: 12px; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
-        .stat-card p { font-size: 24px; font-weight: 800; }
-
-        .layout { display: grid; grid-template-columns: 350px 1fr; gap: 25px; }
-        .glass-card { background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); position: sticky; top: 0; height: fit-content; }
-        
-        /* FORM */
-        .group { margin-bottom: 12px; }
-        label { display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 5px; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 13px; outline: none; background: #f8fafc; }
-        input:focus, textarea:focus { border-color: var(--primary); background: white; }
-
-        /* TABLE */
-        .table-container { background: white; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow); }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 11px; font-weight: 800; color: #64748b; border-bottom: 1px solid #eee; white-space: nowrap; }
-        td { padding: 12px 15px; border-bottom: 1px solid #f8fafc; font-size: 13px; vertical-align: top; }
-        
-        /* STATUS PILLS */
-        .status { padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; border: none; cursor: pointer; width: 100%; }
-        .st-0 { background: #fee2e2; color: #ef4444; }
-        .st-1 { background: #fef3c7; color: #f59e0b; }
-        .st-2 { background: #dcfce7; color: #10b981; }
-
-        /* ACTION BUTTONS */
-        .action-btns { display: flex; gap: 10px; }
-        .action-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s; background: #f1f5f9; color: #64748b; }
-        .action-btn:hover { background: var(--primary); color: white; transform: translateY(-2px); }
-        .btn-del:hover { background: var(--danger) !important; }
-        
-        .copy-tag { color: var(--primary); cursor: pointer; margin-left: 5px; font-size: 14px; }
-        .overdue-alert { color: var(--danger); animation: blink 1s infinite; margin-right: 5px; }
-        @keyframes blink { 50% { opacity: 0.3; } }
-
-        .btn { padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; font-size: 13px; }
-        .btn-p { background: var(--primary); color: white; }
-        .btn-ghost { background: #f1f5f9; color: var(--dark); }
-
-        /* TOAST */
-        #toast-box { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .toast { background: white; border-left: 5px solid var(--primary); color: var(--dark); padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 10px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s forwards; font-weight: 600; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        .page { display: none; }
-        .page.active { display: block; }
-
-        /* PRINT STYLES */
-        #receipt-print { display: none; }
-
-        @media print {
-            body * { display: none !important; }
-            #receipt-print, #receipt-print * { display: block !important; }
-            #receipt-print {
-                position: absolute;
-                inset: 0;
-                background: white;
-                font-family: 'Lexend', sans-serif;
-            }
-        }
-
-        .receipt-card {
-            width: 380px;
-            margin: 0 auto;
-            padding: 20px 18px;
-            border: 2px solid #000;
-            border-radius: 12px;
-        }
-
-        .receipt-header { text-align: center; margin-bottom: 12px; }
-        .receipt-header h2 { font-size: 20px; font-weight: 800; letter-spacing: 1px; }
-        .receipt-header small { font-size: 11px; color: #555; }
-        .receipt-title { text-align: center; font-weight: 800; margin: 10px 0; font-size: 14px; text-transform: uppercase; }
-        .receipt-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
-        .receipt-row span:first-child { font-weight: 600; }
-        .receipt-divider { border-top: 1px dashed #000; margin: 10px 0; }
-        .receipt-footer { text-align: center; margin-top: 12px; font-size: 11px; }
-        .receipt-footer img { margin: 10px auto; display: block; }
-
-        /* LOGIN MODAL */
-        #login-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-            display: none; align-items: center; justify-content: center; z-index: 10001;
-            backdrop-filter: blur(4px);
-        }
-        .login-box {
-            background: white; padding: 30px; border-radius: 20px; width: 320px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center;
-        }
-    </style>
+/* === UI/UX polish: focus, contrast, motion, touch === */
+:root{color-scheme:light}[data-theme=dark]{color-scheme:dark}
+button,select,[role=button],.chip,.nav{cursor:pointer}
+:focus-visible{outline:3px solid var(--p2);outline-offset:2px}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline-offset:0}
+.btn:active,.ab:active,.chip:active,.nav:active{transform:scale(.97)}
+td{overflow-wrap:break-word}td:first-child{white-space:nowrap}h3{text-wrap:balance}
+.stat p,td b,.rr span{font-variant-numeric:tabular-nums}
+td small{color:var(--mut)}
+.st0{color:#b91c1c}.st1{color:#b45309}.st2{color:#047857}
+[data-theme=dark] select.st0{background:#fee2e2;color:#b91c1c}
+[data-theme=dark] select.st1{background:#fef3c7;color:#b45309}
+[data-theme=dark] select.st2{background:#dcfce7;color:#047857}
+.tag.today{color:#047857}.tag.lo{color:#451a03}
+a.tel{color:#047857}
+label:has(+input[required])::after,label:has(+textarea[required])::after{content:' *';color:var(--bad)}
+.cp{padding:4px}
+.skip{position:absolute;left:-9999px;top:8px;z-index:99999;background:#fff;color:var(--ink);padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px}
+.skip:focus{left:12px}
+@media(max-width:700px){
+tbody tr:has(.st0){border-left-color:#dc2626}
+tbody tr:has(.st1){border-left-color:#d97706}
+tbody tr:has(.st2){border-left-color:#059669}
+.ab{height:44px}.card .ab{width:44px;height:44px}
+.cp,a.tel{padding:8px 6px;margin:-8px 0}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
+<a class="skip" href="#main">Bỏ qua điều hướng</a>
+<div id="toasts" role="status" aria-live="polite"></div>
+<datalist id="dl-to"></datalist><datalist id="dl-cust"></datalist>
 
-<div id="toast-box"></div>
-
-<!-- MODAL ĐĂNG NHẬP -->
-<div id="login-overlay">
-    <div class="login-box">
-        <i class="ph ph-lock-key" style="font-size: 40px; color: var(--primary);"></i>
-        <h3 style="margin: 15px 0;">Xác nhận quyền</h3>
-        <input type="text" id="admin-user" placeholder="Tài khoản" style="margin-bottom: 10px;">
-        <input type="password" id="admin-pass" placeholder="Mật khẩu" style="margin-bottom: 20px;">
-        <div style="display: flex; gap: 10px;">
-            <button class="btn btn-ghost" style="flex: 1;" onclick="closeLogin()">Hủy</button>
-            <button class="btn btn-p" style="flex: 1;" onclick="verifyAndDelete()">Xác nhận</button>
-        </div>
+<div id="ov" role="dialog" aria-modal="true" aria-labelledby="ov-t" onclick="if(event.target===this)closeLogin()">
+  <div class="lb">
+    <i aria-hidden="true" class="ph ph-lock-key" style="font-size:40px;color:var(--p)"></i>
+    <h3 id="ov-t" style="margin:12px 0">Xác nhận quyền xóa</h3>
+    <input type="text" id="au" aria-label="Tài khoản" placeholder="Tài khoản" autocomplete="off" style="margin-bottom:10px">
+    <input type="password" id="ap" aria-label="Mật khẩu" placeholder="Mật khẩu" style="margin-bottom:18px" onkeydown="if(event.key==='Enter')verifyAndDelete()">
+    <div style="display:flex;gap:10px">
+      <button class="btn bg" style="flex:1" onclick="closeLogin()">Hủy</button>
+      <button class="btn bp" style="flex:1" onclick="verifyAndDelete()">Xác nhận</button>
     </div>
+  </div>
 </div>
 
 <aside>
-    <div class="logo-box">PC NHƠN TRẠCH PRO</div>
-    <div class="nav-item active" id="nav-bh" onclick="showPage('bh', this)"><i class="ph ph-shield-check"></i> BẢO HÀNH</div>
-    <div class="nav-item" id="nav-sc" onclick="showPage('sc', this)"><i class="ph ph-wrench"></i> SỬA CHỮA</div>
-    <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1)">
-        <button class="btn btn-ghost" style="width: 100%; margin-bottom: 10px; background: rgba(255,255,255,0.05); color: #cbd5e1" onclick="cloudSync(true)">
-            <i class="ph ph-arrows-clockwise"></i> ĐỒNG BỘ NGAY
-        </button>
+  <div class="logo">PC NHƠN TRẠCH PRO</div>
+  <div class="nav on" id="nav-bh" onclick="showPage('bh')"><i aria-hidden="true" class="ph ph-shield-check"></i> Bảo hành <b id="n-bh">0</b></div>
+  <div class="nav" id="nav-sc" onclick="showPage('sc')"><i aria-hidden="true" class="ph ph-wrench"></i> Sửa chữa <b id="n-sc">0</b></div>
+  <div class="side-foot">
+    <div class="sync"><i class="dot" id="dot" aria-hidden="true"></i><span id="sync-txt">Chưa đồng bộ</span></div>
+    <div class="tools">
+      <button class="btn bg" title="Chế độ sáng/tối" aria-label="Chế độ sáng/tối" onclick="toggleTheme()"><i aria-hidden="true" class="ph ph-moon" id="theme-ic"></i></button>
+      <button class="btn bg" title="Sao lưu ra file JSON" aria-label="Sao lưu ra file JSON" onclick="backupJson()"><i aria-hidden="true" class="ph ph-download-simple"></i></button>
+      <button class="btn bg" title="Khôi phục từ file JSON" aria-label="Khôi phục từ file JSON" onclick="$('imp').click()"><i aria-hidden="true" class="ph ph-upload-simple"></i></button>
+      <input type="file" id="imp" aria-label="Chọn file sao lưu JSON" accept=".json,application/json" hidden onchange="importJson(this)">
     </div>
+    <button class="btn bg" onclick="cloudSync(true)"><i aria-hidden="true" class="ph ph-arrows-clockwise"></i> Đồng bộ</button>
+  </div>
 </aside>
 
-<main>
-    <div class="top-header">
-        <div class="header-top-row">
-            <div class="search-box">
-                <i class="ph ph-magnifying-glass"></i>
-                <input type="text" id="mainSearch" placeholder="Tìm tên khách, linh kiện, SĐT, mã đơn..." oninput="handleSearch(this.value)">
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-ghost" onclick="cloudRestore()">TẢI DỮ LIỆU</button>
-                <button class="btn btn-ghost" onclick="exportExcelAll()"><i class="ph ph-file-xls"></i> EXCEL</button>
-            </div>
-        </div>
-        <div class="header-filter-row">
-            <label style="font-size: 12px; font-weight: bold; color: #64748b">LỌC TRẠNG THÁI:</label>
-            <select id="statusFilter" class="filter-select" onchange="render()">
-                <option value="all">Tất cả đơn</option>
-                <option value="0">Chờ / Mới nhận</option>
-                <option value="1">Đang xử lý</option>
-                <option value="2">Đã xong / Đã trả</option>
-                <option value="overdue">Đơn tồn (>7 ngày)</option>
-            </select>
-            <span style="font-size: 11px; color: #94a3b8; margin-left: auto">Sắp xếp: Mới nhất lên đầu</span>
-        </div>
+<main id="main">
+  <div class="top">
+    <div class="search">
+      <i aria-hidden="true" class="ph ph-magnifying-glass"></i>
+      <input type="text" id="q" aria-label="Tìm kiếm phiếu" placeholder="Tìm tên khách, SĐT, linh kiện, serial, mã đơn..." oninput="searchTerm=this.value.trim().toLowerCase();render()">
+      <kbd>Ctrl K</kbd>
     </div>
+    <select id="sortSel" title="Sắp xếp" aria-label="Sắp xếp danh sách" style="width:auto" onchange="sortMode=this.value;render()">
+      <option value="new">Mới nhất trước</option><option value="old">Cũ nhất trước</option><option value="stuck">Tồn lâu nhất trước</option>
+    </select>
+    <button class="btn bg" onclick="cloudRestore()"><i aria-hidden="true" class="ph ph-cloud-arrow-down"></i> Tải dữ liệu</button>
+    <button class="btn bg" onclick="exportExcelAll()"><i aria-hidden="true" class="ph ph-file-xls"></i> Excel</button>
+    <div class="chips" id="chips" role="group" aria-label="Lọc theo trạng thái">
+      <button type="button" class="chip on" data-f="all" aria-pressed="true">Tất cả</button>
+      <button type="button" class="chip" data-f="0" aria-pressed="false">Chờ / Mới nhận</button>
+      <button type="button" class="chip" data-f="1" aria-pressed="false">Đang xử lý</button>
+      <button type="button" class="chip" data-f="2" aria-pressed="false">Đã xong / Đã trả</button>
+      <button type="button" class="chip" data-f="overdue" aria-pressed="false">Đơn tồn &gt; 7 ngày</button>
+    </div>
+  </div>
 
-    <div class="stats-grid">
-        <div class="stat-card"><h4>Đang bảo hành</h4><p id="stat-bh">0</p></div>
-        <div class="stat-card" style="border-color:var(--accent)"><h4>Đang mượn đồ</h4><p id="stat-loan">0</p></div>
-        <div class="stat-card" style="border-color:var(--success)"><h4>Đang sửa chữa</h4><p id="stat-sc">0</p></div>
-    </div>
+  <div class="stats">
+    <div class="stat"><h4>Đang bảo hành</h4><p id="s-bh">0</p></div>
+    <div class="stat" style="border-color:var(--acc)"><h4>Đang mượn đồ</h4><p id="s-loan">0</p></div>
+    <div class="stat" style="border-color:var(--ok)"><h4>Đang sửa chữa</h4><p id="s-sc">0</p></div>
+    <div class="stat" style="border-color:var(--bad)"><h4>Đơn tồn &gt; 7 ngày</h4><p id="s-late">0</p></div>
+    <div class="stat" style="border-color:#8b5cf6"><h4>Còn phải thu (sửa chữa)</h4><p id="s-due" style="font-size:20px;padding-top:4px">0đ</p></div>
+    <div class="stat" style="border-color:var(--p2)"><h4>Nhận hôm nay</h4><p id="s-today">0</p></div>
+  </div>
 
-    <!-- TRANG BẢO HÀNH -->
-    <div id="page-bh" class="page active">
-        <div class="layout">
-            <div class="glass-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-                    <h3>Phiếu Bảo Hành</h3>
-                    <button class="action-btn" title="Nhập mới" onclick="resetForm('bh')"><i class="ph ph-plus"></i></button>
-                </div>
-                <form id="form-bh">
-                    <input type="hidden" id="bh-id">
-                    <div class="group"><label>Nơi gửi bảo hành</label><input type="text" id="bh-to" placeholder="VD: Viết Sơn, Thủy Linh..." required></div>
-                    <div class="group"><label>Khách hàng (Tên & SĐT)</label><input type="text" id="bh-cust" required></div>
-                    <div class="group"><label>Linh kiện & SN</label>
-                        <input type="text" id="bh-prod" placeholder="Tên linh kiện" required>
-                        <input type="text" id="bh-sn" placeholder="Số Serial (SN)" style="margin-top:5px">
-                    </div>
-                    <div class="group"><label>Ghi chú</label><textarea id="bh-note" rows="2"></textarea></div>
-                    <div class="loan-alert">
-                        <label>LINH KIỆN CHO MƯỢN</label><input type="text" id="bh-loan">
-                    </div>
-                    <button class="btn btn-p" style="width:100%; margin-top:15px">LƯU PHIẾU & ĐẨY CLOUD</button>
-                </form>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Ngày nhận</th>
-                            <th>Khách / Linh kiện</th>
-                            <th>Nơi gửi</th> <!-- CỘT MỚI -->
-                            <th>Mượn</th>
-                            <th style="width:120px">Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-bh"></tbody>
-                </table>
-            </div>
+  <div id="page-bh" class="page on">
+    <div class="layout">
+      <div class="card" id="card-bh">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h3>Phiếu bảo hành</h3>
+          <button class="ab" title="Nhập mới" aria-label="Nhập mới" onclick="resetForm('bh')"><i aria-hidden="true" class="ph ph-plus"></i></button>
         </div>
+        <div class="edit-badge"><i aria-hidden="true" class="ph ph-pencil-simple"></i> Đang sửa phiếu #<span id="eb-bh"></span></div>
+        <form id="form-bh">
+          <input type="hidden" id="bh-id">
+          <div class="g"><label for="bh-to">Nơi gửi bảo hành</label><input id="bh-to" list="dl-to" autocomplete="off" placeholder="VD: Viết Sơn, Thủy Linh..." required></div>
+          <div class="g"><label for="bh-cust">Khách hàng (tên & SĐT)</label><input id="bh-cust" list="dl-cust" autocomplete="off" required></div>
+          <div class="g"><label for="bh-prod">Linh kiện & serial</label>
+            <input id="bh-prod" placeholder="Tên linh kiện" required>
+            <input id="bh-sn" aria-label="Số serial" placeholder="Số serial (SN)" style="margin-top:6px"></div>
+          <div class="g"><label for="bh-note">Ghi chú</label><textarea id="bh-note" rows="2"></textarea></div>
+          <div class="g loan"><label for="bh-loan">Linh kiện cho mượn</label><input id="bh-loan"></div>
+          <button class="btn bp full" id="sv-bh" style="margin-top:6px"><i aria-hidden="true" class="ph ph-floppy-disk"></i> Lưu phiếu</button>
+        </form>
+      </div>
+      <div class="tbl"><table aria-label="Danh sách phiếu bảo hành">
+        <thead><tr><th scope="col">Ngày nhận</th><th scope="col">Khách / Linh kiện</th><th scope="col">Nơi gửi</th><th scope="col">Mượn</th><th scope="col" style="width:120px">Trạng thái</th><th scope="col">Thao tác</th></tr></thead>
+        <tbody id="tb-bh"></tbody></table></div>
     </div>
+  </div>
 
-    <!-- TRANG SỬA CHỮA -->
-    <div id="page-sc" class="page">
-        <div class="layout">
-            <div class="glass-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-                    <h3>Phiếu Sửa Chữa</h3>
-                    <button class="action-btn" title="Nhập mới" onclick="resetForm('sc')"><i class="ph ph-plus"></i></button>
-                </div>
-                <form id="form-sc">
-                    <input type="hidden" id="sc-id">
-                    <div class="group"><label>Khách hàng (Tên & SĐT)</label><input type="text" id="sc-cust" required></div>
-                    <div class="group"><label>Linh kiện sửa chữa</label><input type="text" id="sc-dev" required></div>
-                    <div class="group"><label>Tình trạng / Ghi chú</label><textarea id="sc-issue" rows="2"></textarea></div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
-                        <div class="group"><label>Phí dự kiến</label><input type="number" id="sc-cost"></div>
-                        <div class="group"><label>Đã cọc</label><input type="number" id="sc-dep"></div>
-                    </div>
-                    <button class="btn btn-p" style="width:100%">LẬP PHIẾU & ĐẨY CLOUD</button>
-                </form>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>Ngày nhận</th><th>Linh kiện / Khách</th><th>Phí sửa</th><th style="width:120px">Trạng thái</th><th>Thao tác</th></tr></thead>
-                    <tbody id="tbody-sc"></tbody>
-                </table>
-            </div>
+  <div id="page-sc" class="page">
+    <div class="layout">
+      <div class="card" id="card-sc">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h3>Phiếu sửa chữa</h3>
+          <button class="ab" title="Nhập mới" aria-label="Nhập mới" onclick="resetForm('sc')"><i aria-hidden="true" class="ph ph-plus"></i></button>
         </div>
+        <div class="edit-badge"><i aria-hidden="true" class="ph ph-pencil-simple"></i> Đang sửa phiếu #<span id="eb-sc"></span></div>
+        <form id="form-sc">
+          <input type="hidden" id="sc-id">
+          <div class="g"><label for="sc-cust">Khách hàng (tên & SĐT)</label><input id="sc-cust" list="dl-cust" autocomplete="off" required></div>
+          <div class="g"><label for="sc-dev">Linh kiện sửa chữa</label><input id="sc-dev" required></div>
+          <div class="g"><label for="sc-issue">Tình trạng / ghi chú</label><textarea id="sc-issue" rows="2"></textarea></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="g"><label for="sc-cost">Phí dự kiến</label><input type="number" min="0" id="sc-cost"></div>
+            <div class="g"><label for="sc-dep">Đã cọc</label><input type="number" min="0" id="sc-dep"></div>
+          </div>
+          <button class="btn bp full" id="sv-sc"><i aria-hidden="true" class="ph ph-floppy-disk"></i> Lập phiếu</button>
+        </form>
+      </div>
+      <div class="tbl"><table aria-label="Danh sách phiếu sửa chữa">
+        <thead><tr><th scope="col">Ngày nhận</th><th scope="col">Linh kiện / Khách</th><th scope="col">Phí sửa</th><th scope="col" style="width:120px">Trạng thái</th><th scope="col">Thao tác</th></tr></thead>
+        <tbody id="tb-sc"></tbody></table></div>
     </div>
+  </div>
 </main>
 
-<!-- PHẦN IN PHIẾU -->
-<div id="receipt-print">
-    <div class="receipt-card">
-        <div class="receipt-header">
-            <h2>PC NHƠN TRẠCH PRO</h2>
-            <small>Nhận sửa chữa & bảo hành linh kiện</small>
-        </div>
-        <div class="receipt-title" id="receipt-type"></div>
-        <div id="receipt-content"></div>
-        <div class="receipt-divider"></div>
-        <div class="receipt-footer">
-            <img id="qr-code" width="160" height="160">
-            <div>Cảm ơn quý khách đã tin tưởng ❤️</div>
-            <div>Vui lòng giữ phiếu khi nhận máy</div>
-        </div>
-    </div>
-</div>
+<div id="rp"><div class="rc">
+  <div class="rh"><h2>PC NHƠN TRẠCH PRO</h2><small>Nhận sửa chữa & bảo hành linh kiện</small></div>
+  <div class="rt" id="r-type"></div>
+  <div id="r-body"></div>
+  <div class="rd"></div>
+  <div class="rf"><img id="qr" width="160" height="160" alt="QR"><div>Cảm ơn quý khách đã tin tưởng ❤️</div><div>Vui lòng giữ phiếu khi nhận máy</div></div>
+</div></div>
+
+<div id="sheet-bg" onclick="closeSheet()"></div>
+<nav id="bnav">
+  <button id="bn-bh" class="on" onclick="showPage('bh')"><i aria-hidden="true" class="ph ph-shield-check"></i>Bảo hành<b id="bn-n-bh" style="display:none">0</b></button>
+  <button class="fab" onclick="fabAdd()" aria-label="Thêm phiếu mới"><i aria-hidden="true" class="ph ph-plus"></i></button>
+  <button id="bn-sc" onclick="showPage('sc')"><i aria-hidden="true" class="ph ph-wrench"></i>Sửa chữa<b id="bn-n-sc" style="display:none">0</b></button>
+</nav>
 
 <script>
-    const G_URL = 'https://script.google.com/macros/s/AKfycbyZKTxQweonx1b1J59qS0P2UGIyBoWsLgTjjkP0vdqqc9KxVxpDC-Fe60IWGmaonepMCw/exec';
-    let db_bh = JSON.parse(localStorage.getItem('db_bh') || '[]');
-    let db_sc = JSON.parse(localStorage.getItem('db_sc') || '[]');
-    let searchTerm = "";
-    let pendingDelete = { type: null, id: null };
+const G_URL='https://script.google.com/macros/s/AKfycbyZKTxQweonx1b1J59qS0P2UGIyBoWsLgTjjkP0vdqqc9KxVxpDC-Fe60IWGmaonepMCw/exec';
+const load=k=>{try{return JSON.parse(localStorage.getItem(k)||'[]')}catch(e){return[]}};
+let dirty=false,sortMode='new';let db_bh=load('db_bh'),db_sc=load('db_sc'),searchTerm='',filter='all',page='bh',pending=null,syncTimer=null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>(Number(n)||0).toLocaleString('vi-VN')+'đ';
 
-    function notify(msg, color = '#6366f1') {
-        const box = document.getElementById('toast-box');
-        const t = document.createElement('div');
-        t.className = 'toast';
-        t.style.borderLeftColor = color;
-        t.innerHTML = `<i class="ph ph-info" style="color:${color}"></i> ${msg}`;
-        box.appendChild(t);
-        setTimeout(() => t.remove(), 2500);
-    }
+function notify(msg,color='#4f46e5',act){
+  const t=document.createElement('div');t.className='toast';t.style.borderLeftColor=color;
+  t.innerHTML=`<i aria-hidden="true" class="ph ph-info" style="color:${color}"></i> ${esc(msg)}`;
+  if(act){const b=document.createElement('button');b.className='btn bp';b.style.padding='5px 12px';
+    b.textContent=act.label;b.onclick=()=>{act.fn();t.remove()};t.appendChild(b)}
+  $('toasts').appendChild(t);setTimeout(()=>t.remove(),act?7000:2500);
+}
+function clip(t){
+  if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(t);
+  return new Promise((ok,no)=>{
+    const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(a);a.select();
+    try{document.execCommand('copy')?ok():no()}catch(e){no(e)}a.remove();
+  });
+}
+function copy(el,label){
+  const v=el.dataset.v;if(!v)return;
+  clip(v).then(()=>notify('Đã copy '+label,'#10b981'),()=>notify('Không copy được','#ef4444'));
+}
+function parseDate(s){const p=String(s).split('/');return new Date(p[2],p[1]-1,p[0])}
+function isLate(d,st){return st!=2&&(new Date()-parseDate(d))/864e5>7}
+function dueDate(s,n=7){const d=parseDate(s);while(n>0){d.setDate(d.getDate()+1);if(d.getDay()!==0)n--}return d}
+const dueStr=s=>{const d=dueDate(s);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')};
+const dueLate=s=>new Date()>new Date(dueDate(s).getTime()+864e5);
+function copyMsg(type,id){
+  const i=(type==='bh'?db_bh:db_sc).find(x=>x.id==id);if(!i)return;
+  const name=String(i.customer||'').replace(/[\d+.\- ]{9,}/g,'').trim()||'anh/chị';
+  const item=type==='bh'?i.product+(i.serial?' (SN '+i.serial+')':''):i.device;
+  const st=type==='bh'?['đã được tiếp nhận để gửi bảo hành','đang được bảo hành','đã bảo hành xong']:['đã được tiếp nhận sửa chữa','đang được sửa chữa','đã sửa xong'];
+  let m=`Chào ${name}, PC Nhơn Trạch xin thông báo: ${item} ${st[i.status]||st[0]} (phiếu #${i.id}).`;
+  if(i.status==2){
+    m+=' Anh/chị vui lòng qua nhận máy kèm phiếu.';
+    if(type==='sc'&&Number(i.cost))m+=` Chi phí ${money(i.cost)}`+(Number(i.deposit)?`, đã cọc ${money(i.deposit)}, còn lại ${money(i.cost-i.deposit)}.`:'.');
+  }else{
+    m+=` Dự kiến hoàn tất khoảng ${dueStr(i.date)}, có kết quả mình sẽ báo ngay.`;
+    if(type==='bh'&&i.loanItem)m+=` Trong thời gian chờ anh/chị đang mượn ${i.loanItem}.`;
+  }
+  clip(m).then(()=>notify('Đã copy tin nhắn báo khách','#10b981'),()=>notify('Không copy được','#ef4444'));
+}
+const ageDays=d=>Math.floor((new Date()-parseDate(d))/864e5);
+function phoneLink(s){
+  const m=String(s||'').match(/(?:\+?84|0)[\d .\-]{8,12}\d/);if(!m)return'';
+  const n=m[0].replace(/[^\d+]/g,'');
+  return `<a class="tel" href="tel:${esc(n)}" title="Gọi ${esc(n)}"><i aria-hidden="true" class="ph ph-phone"></i></a>`;
+}
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  $('theme-ic').className='ph '+(t==='dark'?'ph-sun':'ph-moon');
+}
+function toggleTheme(){
+  const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  try{localStorage.setItem('theme',t)}catch(e){}applyTheme(t);
+}
+function backupJson(){
+  const blob=new Blob([JSON.stringify({db_bh,db_sc},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='PC_NhonTrach_backup_'+new Date().toLocaleDateString('vi-VN').replace(/\//g,'-')+'.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  notify('Đã tải file sao lưu','#10b981');
+}
+function importJson(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!Array.isArray(d.db_bh)&&!Array.isArray(d.db_sc))throw 0;
+      let add=0;
+      const merge=(cur,inc)=>{(inc||[]).forEach(x=>{if(x&&x.id&&!cur.some(c=>c.id==x.id)){cur.push(x);add++}})};
+      merge(db_bh,d.db_bh);merge(db_sc,d.db_sc);
+      saveLocal();render();notify(`Khôi phục xong: thêm ${add} phiếu mới`,'#10b981');
+    }catch(e){notify('File sao lưu không hợp lệ','#ef4444')}
+    inp.value='';
+  };
+  r.readAsText(f);
+}
+function setSync(state,txt){$('dot').className='dot '+state;$('sync-txt').textContent=txt}
 
-    function copy(val, label) {
-        if (!val) return;
-        navigator.clipboard.writeText(val).then(() => notify(`Đã copy ${label}`, '#10b981'));
-    }
+function showPage(id){
+  page=id;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));
+  $('page-'+id).classList.add('on');$('nav-'+id).classList.add('on');render();
+}
+$('chips').onclick=e=>{
+  const c=e.target.closest('.chip');if(!c)return;
+  filter=c.dataset.f;
+  document.querySelectorAll('.chip').forEach(x=>{x.classList.toggle('on',x===c);x.setAttribute('aria-pressed',x===c)});render();
+};
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('q').focus();$('q').select()}
+  if(e.key==='Escape')closeLogin();
+});
 
-    function parseDate(str) {
-        const parts = str.split('/');
-        return new Date(parts[2], parts[1] - 1, parts[0]);
-    }
+function resetForm(t,silent){
+  $('form-'+t).reset();$(t+'-id').value='';
+  $('card-'+t).classList.remove('editing');
+  $('sv-'+t).innerHTML=`<i aria-hidden="true" class="ph ph-floppy-disk"></i> ${t==='bh'?'Lưu phiếu':'Lập phiếu'}`;
+  if(!silent)notify('Form đã được làm mới');
+}
+function startEdit(t,id){
+  $(t+'-id').value=id;$('eb-'+t).textContent=id;
+  $('card-'+t).classList.add('editing');
+  $('sv-'+t).innerHTML='<i aria-hidden="true" class="ph ph-check"></i> Cập nhật phiếu';
+  $('main').scrollTo({top:0,behavior:'smooth'});window.scrollTo({top:0,behavior:'smooth'});
+  notify('Đã tải dữ liệu lên form sửa');
+}
 
-    function isOverdue(dateStr, status) {
-        if (status == 2) return false;
-        const diff = (new Date() - parseDate(dateStr)) / (1000 * 60 * 60 * 24);
-        return diff > 7;
-    }
+async function cloudSync(manual=false){
+  setSync('busy','Đang đồng bộ...');if(manual)notify('Đang đồng bộ dữ liệu...');
+  try{
+    await fetch(G_URL,{method:'POST',body:JSON.stringify({db_bh,db_sc})});
+    dirty=false;setSync('ok','Đã đồng bộ '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}));
+    if(manual)notify('Đồng bộ hoàn tất!','#10b981');
+  }catch(e){dirty=true;setSync('err','Lỗi đồng bộ - sẽ thử lại khi có mạng');if(manual)notify('Lỗi đồng bộ Cloud','#ef4444')}
+}
+async function cloudRestore(silent=false){
+  if(!silent)notify('Đang tải dữ liệu Cloud...');setSync('busy','Đang tải...');
+  try{
+    const d=await (await fetch(G_URL)).json();
+    db_bh=d.db_bh||[];db_sc=d.db_sc||[];persist();render();
+    setSync('ok','Đã tải từ Cloud');if(!silent)notify('Tải dữ liệu thành công!','#10b981');
+  }catch(e){setSync('err','Lỗi tải dữ liệu');if(!silent)notify('Lỗi tải dữ liệu','#ef4444')}
+}
+function persist(){
+  localStorage.setItem('db_bh',JSON.stringify(db_bh));
+  localStorage.setItem('db_sc',JSON.stringify(db_sc));
+}
+function saveLocal(){
+  persist();updateStats();dirty=true;
+  clearTimeout(syncTimer);syncTimer=setTimeout(()=>cloudSync(),700);
+}
 
-    function handleSearch(val) {
-        searchTerm = val.trim().toLowerCase();
-        render();
-    }
+function deleteItem(type,id){
+  pending={type,id};$('ov').style.display='flex';$('au').focus();
+}
+function closeLogin(){$('ov').style.display='none';$('au').value='';$('ap').value='';pending=null}
+function verifyAndDelete(){
+  if($('au').value==='bao'&&$('ap').value==='123'&&pending){
+    const t=pending.type,gone=(t==='bh'?db_bh:db_sc).find(x=>x.id==pending.id);
+    if(t==='bh')db_bh=db_bh.filter(x=>x.id!=pending.id);
+    else db_sc=db_sc.filter(x=>x.id!=pending.id);
+    saveLocal();render();closeLogin();
+    notify('Đã xóa phiếu','#ef4444',gone?{label:'Hoàn tác',fn:()=>{(t==='bh'?db_bh:db_sc).unshift(gone);saveLocal();render();notify('Đã khôi phục phiếu','#10b981')}}:null);
+  }else notify('Sai tài khoản hoặc mật khẩu!','#ef4444');
+}
 
-    function showPage(id, el) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById('page-' + id).classList.add('active');
-        el.classList.add('active');
-        render();
-    }
+function updateStats(){
+  const bh=db_bh.filter(x=>x.status!=2),sc=db_sc.filter(x=>x.status!=2);
+  $('s-bh').textContent=bh.length;$('n-bh').textContent=bh.length;
+  $('s-sc').textContent=sc.length;$('n-sc').textContent=sc.length;
+  $('s-loan').textContent=bh.filter(x=>String(x.loanItem||'').trim()).length;
+  $('s-due').textContent=money(db_sc.filter(x=>x.status!=2).reduce((s,x)=>s+Math.max(0,(Number(x.cost)||0)-(Number(x.deposit)||0)),0));
+  const td=new Date().toLocaleDateString('vi-VN');$('s-today').textContent=[...db_bh,...db_sc].filter(x=>x.date==td).length;
+  $('s-late').textContent=[...db_bh,...db_sc].filter(x=>isLate(x.date,x.status)).length;
+}
 
-    function resetForm(type) {
-        document.getElementById(`form-${type}`).reset();
-        document.getElementById(`${type}-id`).value = "";
-        notify("Form đã được làm mới");
-    }
+$('form-bh').onsubmit=e=>{
+  e.preventDefault();
+  const id=$('bh-id').value||'BH'+Date.now().toString().slice(-6),old=db_bh.find(x=>x.id==id);
+  const entry={id,date:old?old.date:new Date().toLocaleDateString('vi-VN'),
+    to:$('bh-to').value.trim(),customer:$('bh-cust').value.trim(),product:$('bh-prod').value.trim(),
+    serial:$('bh-sn').value.trim(),note:$('bh-note').value.trim(),loanItem:$('bh-loan').value.trim(),
+    status:old?old.status:0,upd:old?old.upd:''};
+  const i=db_bh.findIndex(x=>x.id==id);
+  if(i>-1)db_bh[i]=entry;else db_bh.unshift(entry);
+  saveLocal();render();resetForm('bh',true);notify('Đã lưu đơn Bảo hành!');
+};
+$('form-sc').onsubmit=e=>{
+  e.preventDefault();
+  const id=$('sc-id').value||'SC'+Date.now().toString().slice(-6),old=db_sc.find(x=>x.id==id);
+  const entry={id,date:old?old.date:new Date().toLocaleDateString('vi-VN'),
+    customer:$('sc-cust').value.trim(),device:$('sc-dev').value.trim(),issue:$('sc-issue').value.trim(),
+    cost:$('sc-cost').value||0,deposit:$('sc-dep').value||0,status:old?old.status:0,upd:old?old.upd:''};
+  const i=db_sc.findIndex(x=>x.id==id);
+  if(i>-1)db_sc[i]=entry;else db_sc.unshift(entry);
+  saveLocal();render();resetForm('sc',true);notify('Đã lưu đơn Sửa chữa!');
+};
 
-    async function cloudSync(manual = false) {
-        if (manual) notify("Đang đồng bộ dữ liệu...");
-        try {
-            await fetch(G_URL, { method: 'POST', body: JSON.stringify({ db_bh, db_sc }) });
-            if (manual) notify("Đồng bộ hoàn tất!", "#10b981");
-        } catch(e) { if (manual) notify("Lỗi đồng bộ Cloud", "#ef4444"); }
-    }
+function pass(i,hay,st){
+  if(!hay.toLowerCase().includes(searchTerm))return false;
+  return filter==='all'||(filter==='overdue'?isLate(i.date,i.status):i.status==filter);
+}
+const byNew=(a,b)=>parseDate(b.date)-parseDate(a.date)||String(b.id).localeCompare(String(a.id));
+const sorter=()=>sortMode==='old'?(a,b)=>byNew(b,a):sortMode==='stuck'?(a,b)=>(a.status==2)-(b.status==2)||byNew(b,a):byNew;
+const empty=(c,m)=>`<tr><td colspan="${c}"><div class="empty"><i aria-hidden="true" class="ph ph-tray"></i>${m}</div></td></tr>`;
+const dateCell=i=>`${i.date==new Date().toLocaleDateString('vi-VN')?'<span class="tag today">HÔM NAY</span><br>':''}${isLate(i.date,i.status)?'<i aria-hidden="true" class="ph ph-warning late" title="Quá hạn 7 ngày"></i>':''}<b>${esc(i.date)}</b><br><small>#${esc(i.id)}</small>${i.status!=2&&ageDays(i.date)>0?`<br><span class="age${dueLate(i.date)?' old':''}">${ageDays(i.date)} ngày · hẹn ${dueStr(i.date)}</span>`:''}`;
+const cpy=(v,l)=>`<i class="ph ph-copy cp" role="button" tabindex="0" aria-label="Copy ${l}" data-v="${esc(v)}" onclick="copy(this,'${l}')"></i>`;
 
-    async function cloudRestore() {
-        notify("Đang tải dữ liệu Cloud...");
-        try {
-            const r = await fetch(G_URL);
-            const d = await r.json();
-            db_bh = d.db_bh || []; db_sc = d.db_sc || [];
-            localStorage.setItem('db_bh', JSON.stringify(db_bh));
-            localStorage.setItem('db_sc', JSON.stringify(db_sc));
-            render();
-            notify("Tải dữ liệu thành công!", "#10b981");
-        } catch(e) { notify("Lỗi tải dữ liệu", "#ef4444"); }
-    }
+function fillLists(){
+  const u=a=>[...new Set(a.map(x=>String(x||'').trim()).filter(Boolean))].slice(0,80).map(v=>`<option value="${esc(v)}">`).join('');
+  $('dl-to').innerHTML=u(db_bh.map(x=>x.to));
+  $('dl-cust').innerHTML=u([...db_bh,...db_sc].map(x=>x.customer));
+}
+function render(){
+  const bh=[...db_bh].sort(sorter()).filter(i=>pass(i,[i.customer,i.product,i.id,i.serial,i.to,i.loanItem,i.note].join(' ')));
+  $('tb-bh').innerHTML=bh.map(i=>`<tr>
+    <td>${dateCell(i)}</td>
+    <td><b>${esc(i.customer)}</b> ${cpy(i.customer,'tên khách')}${phoneLink(i.customer)}<br>${esc(i.product)}
+      ${i.serial?`<br><small>SN: ${esc(i.serial)}</small> ${cpy(i.serial,'số serial')}`:''}
+      ${i.note?`<br><small>${esc(i.note)}</small>`:''}</td>
+    <td><span style="color:var(--p);font-weight:600">${esc(i.to)||'-'}</span></td>
+    <td>${i.loanItem?`<span class="tag lo">${esc(i.loanItem)}</span>`:'-'}</td>
+    <td><select onchange="updateSt('bh','${esc(i.id)}',this.value)" class="st st${i.status}" aria-label="Trạng thái phiếu #${esc(i.id)}">
+      <option value="0" ${i.status==0?'selected':''}>Chờ chuyển</option>
+      <option value="1" ${i.status==1?'selected':''}>Đang BH</option>
+      <option value="2" ${i.status==2?'selected':''}>Đã xong</option></select>${i.upd?`<br><small>${esc(i.upd)}</small>`:''}</td>
+    <td><div class="acts">
+      <button class="ab" title="Sửa" aria-label="Sửa" onclick="editBH('${esc(i.id)}')"><i aria-hidden="true" class="ph ph-pencil-simple"></i></button>
+      <button class="ab" title="Copy tin nhắn báo khách" aria-label="Copy tin nhắn báo khách" onclick="copyMsg('bh','${esc(i.id)}')"><i aria-hidden="true" class="ph ph-chat-circle-text"></i></button>
+      <button class="ab" title="In phiếu" aria-label="In phiếu" onclick="printRec('bh','${esc(i.id)}')"><i aria-hidden="true" class="ph ph-printer"></i></button>
+      <button class="ab del" title="Xóa" aria-label="Xóa" onclick="deleteItem('bh','${esc(i.id)}')"><i aria-hidden="true" class="ph ph-trash"></i></button></div></td>
+  </tr>`).join('')||empty(6,'Chưa có phiếu bảo hành nào khớp bộ lọc.');
 
-    function saveLocal() {
-        localStorage.setItem('db_bh', JSON.stringify(db_bh));
-        localStorage.setItem('db_sc', JSON.stringify(db_sc));
-        updateStats();
-        cloudSync(); 
-    }
+  const sc=[...db_sc].sort(sorter()).filter(i=>pass(i,[i.customer,i.device,i.id,i.issue].join(' ')));
+  $('tb-sc').innerHTML=sc.map(i=>`<tr>
+    <td>${dateCell(i)}</td>
+    <td><b>${esc(i.customer)}</b> ${cpy(i.customer,'tên khách')}${phoneLink(i.customer)}<br>${esc(i.device)}${i.issue?`<br><small>${esc(i.issue)}</small>`:''}</td>
+    <td><b>${money(i.cost)}</b>${Number(i.deposit)?`<br><small>Cọc ${money(i.deposit)} · còn ${money(i.cost-i.deposit)}</small>`:''}</td>
+    <td><select onchange="updateSt('sc','${esc(i.id)}',this.value)" class="st st${i.status}" aria-label="Trạng thái phiếu #${esc(i.id)}">
+      <option value="0" ${i.status==0?'selected':''}>Mới nhận</option>
+      <option value="1" ${i.status==1?'selected':''}>Đang sửa</option>
+      <option value="2" ${i.status==2?'selected':''}>Đã trả</option></select>${i.upd?`<br><small>${esc(i.upd)}</small>`:''}</td>
+    <td><div class="acts">
+      <button class="ab" title="Sửa" aria-label="Sửa" onclick="editSC('${esc(i.id)}')"><i aria-hidden="true" class="ph ph-pencil-simple"></i></button>
+      <button class="ab" title="Copy tin nhắn báo khách" aria-label="Copy tin nhắn báo khách" onclick="copyMsg('sc','${esc(i.id)}')"><i aria-hidden="true" class="ph ph-chat-circle-text"></i></button>
+      <button class="ab" title="In phiếu" aria-label="In phiếu" onclick="printRec('sc','${esc(i.id)}')"><i aria-hidden="true" class="ph ph-printer"></i></button>
+      <button class="ab del" title="Xóa" aria-label="Xóa" onclick="deleteItem('sc','${esc(i.id)}')"><i aria-hidden="true" class="ph ph-trash"></i></button></div></td>
+  </tr>`).join('')||empty(5,'Chưa có phiếu sửa chữa nào khớp bộ lọc.');
+  updateStats();fillLists();
+}
 
-    function deleteItem(type, id) {
-        pendingDelete = { type, id };
-        document.getElementById('login-overlay').style.display = 'flex';
-        document.getElementById('admin-user').focus();
-    }
+function editBH(id){
+  const i=db_bh.find(x=>x.id==id);if(!i)return;
+  $('bh-to').value=i.to||'';$('bh-cust').value=i.customer||'';$('bh-prod').value=i.product||'';
+  $('bh-sn').value=i.serial||'';$('bh-note').value=i.note||'';$('bh-loan').value=i.loanItem||'';
+  startEdit('bh',id);
+}
+function editSC(id){
+  const i=db_sc.find(x=>x.id==id);if(!i)return;
+  $('sc-cust').value=i.customer||'';$('sc-dev').value=i.device||'';$('sc-issue').value=i.issue||'';
+  $('sc-cost').value=i.cost||0;$('sc-dep').value=i.deposit||0;
+  startEdit('sc',id);
+}
 
-    function closeLogin() {
-        document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('admin-user').value = "";
-        document.getElementById('admin-pass').value = "";
-    }
+function printRec(type,id){
+  const it=(type==='bh'?db_bh:db_sc).find(x=>x.id==id);if(!it)return;
+  const row=(a,b)=>`<div class="rr"><span>${a}</span><span>${esc(b)}</span></div>`;
+  $('r-type').textContent=type==='bh'?'PHIẾU BẢO HÀNH':'PHIẾU SỬA CHỮA';
+  $('r-body').innerHTML=row('Mã đơn','#'+it.id)+row('Ngày nhận',it.date)+'<div class="rd"></div>'+
+    row('Khách hàng',it.customer)+row('Linh kiện',type==='bh'?it.product:it.device)+
+    (type==='bh'
+      ?(it.serial?row('Serial',it.serial):'')+row('Nơi gửi BH',it.to||'-')+row('Mượn đồ',it.loanItem||'Không')
+      :row('Phí sửa',money(it.cost))+(Number(it.deposit)?row('Đã cọc',money(it.deposit))+row('Còn lại',money(it.cost-it.deposit)):''))+
+    '<div class="rd"></div>'+row('Ghi chú',(type==='bh'?it.note:it.issue)||'Không có');
+  const img=$('qr');
+  img.onload=()=>window.print();
+  img.onerror=()=>{notify('Không tải được mã QR, vẫn in phiếu','#f59e0b');window.print()};
+  img.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(`PC NHON TRACH | ${it.id} | ${it.customer}`);
+}
 
-    function verifyAndDelete() {
-        const u = document.getElementById('admin-user').value;
-        const p = document.getElementById('admin-pass').value;
-        if(u === 'bao' && p === '123') {
-            if (pendingDelete.type === 'bh') db_bh = db_bh.filter(x => x.id != pendingDelete.id);
-            else db_sc = db_sc.filter(x => x.id != pendingDelete.id);
-            saveLocal(); render(); notify("Đã xác thực và xóa đơn hàng", "#ef4444");
-            closeLogin();
-        } else {
-            notify("Sai tài khoản hoặc mật khẩu!", "#ef4444");
-        }
-    }
+function updateSt(type,id,val){
+  const it=(type==='bh'?db_bh:db_sc).find(x=>x.id==id);
+  if(it){it.status=parseInt(val);it.upd='Cập nhật '+new Date().toLocaleString('vi-VN',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});saveLocal();render();notify('Đã cập nhật trạng thái đơn!')}
+}
+function exportExcelAll(){
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(db_bh),'BaoHanh');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(db_sc),'SuaChua');
+  XLSX.writeFile(wb,`PC_NhonTrach_${new Date().toLocaleDateString('vi-VN').replace(/\//g,'-')}.xlsx`);
+}
 
-    function updateStats() {
-        document.getElementById('stat-bh').innerText = db_bh.filter(x=>x.status!=2).length;
-        document.getElementById('stat-loan').innerText = db_bh.filter(x=>x.loanItem && String(x.loanItem).trim() !== "" && x.status!=2).length;
-        document.getElementById('stat-sc').innerText = db_sc.filter(x=>x.status!=2).length;
-    }
-
-    document.getElementById('form-bh').onsubmit = (e) => {
-        e.preventDefault();
-        const id = document.getElementById('bh-id').value || "BH" + Date.now().toString().slice(-6);
-        const entry = {
-            id, date: new Date().toLocaleDateString('vi-VN'),
-            to: document.getElementById('bh-to').value, customer: document.getElementById('bh-cust').value,
-            product: document.getElementById('bh-prod').value, serial: document.getElementById('bh-sn').value,
-            note: document.getElementById('bh-note').value, loanItem: document.getElementById('bh-loan').value,
-            status: 0
-        };
-        const idx = db_bh.findIndex(x => x.id == id);
-        if(idx > -1) db_bh[idx] = entry; else db_bh.unshift(entry);
-        saveLocal(); render(); resetForm('bh'); notify("Đã lưu & đồng bộ đơn Bảo hành!");
-    };
-
-    document.getElementById('form-sc').onsubmit = (e) => {
-        e.preventDefault();
-        const id = document.getElementById('sc-id').value || "SC" + Date.now().toString().slice(-6);
-        const entry = {
-            id, date: new Date().toLocaleDateString('vi-VN'),
-            customer: document.getElementById('sc-cust').value, device: document.getElementById('sc-dev').value,
-            issue: document.getElementById('sc-issue').value, cost: document.getElementById('sc-cost').value || 0,
-            deposit: document.getElementById('sc-dep').value || 0, status: 0
-        };
-        const idx = db_sc.findIndex(x => x.id == id);
-        if(idx > -1) db_sc[idx] = entry; else db_sc.unshift(entry);
-        saveLocal(); render(); resetForm('sc'); notify("Đã lưu & đồng bộ đơn Sửa chữa!");
-    };
-
-    function render() {
-        const fVal = document.getElementById('statusFilter').value;
-        const today = new Date().toLocaleDateString('vi-VN');
-
-        let fBH = db_bh.sort((a,b) => parseDate(b.date) - parseDate(a.date)).filter(i => {
-            const matchSearch = (String(i.customer) + String(i.product) + String(i.id) + String(i.serial) + String(i.to)).toLowerCase().includes(searchTerm);
-            const matchStatus = fVal === "all" ? true : (fVal === "overdue" ? isOverdue(i.date, i.status) : i.status == fVal);
-            return matchSearch && matchStatus;
-        });
-
-        document.getElementById('tbody-bh').innerHTML = fBH.map(i => `
-            <tr>
-                <td>
-                    ${i.date == today ? '<span style="color:var(--success);font-weight:bold;font-size:10px">HÔM NAY</span><br>' : ''}
-                    ${isOverdue(i.date, i.status) ? '<i class="ph ph-warning overdue-alert" title="Quá hạn 7 ngày"></i>' : ''}
-                    <b>${i.date}</b><br><small style="color:#94a3b8">#${i.id}</small>
-                </td>
-                <td>
-                    <b>${i.customer}</b> <i class="ph ph-copy copy-tag" onclick="copy('${i.customer}','tên khách')"></i><br>
-                    ${i.product} ${i.serial ? `<br><small style="color:#64748b">SN: ${i.serial}</small> <i class="ph ph-copy copy-tag" onclick="copy('${i.serial}','Số Serial')"></i>` : ''}
-                </td>
-                <td><span style="color:var(--primary); font-weight:600">${i.to || '-'}</span></td> <!-- HIỂN THỊ NƠI GỬI -->
-                <td>${i.loanItem ? `<span style="background:var(--accent); color:white; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:bold">${i.loanItem}</span>` : '-'}</td>
-                <td>
-                    <select onchange="updateSt('bh','${i.id}',this.value)" class="status st-${i.status}">
-                        <option value="0" ${i.status==0?'selected':''}>Chờ chuyển</option>
-                        <option value="1" ${i.status==1?'selected':''}>Đang BH</option>
-                        <option value="2" ${i.status==2?'selected':''}>Đã xong</option>
-                    </select>
-                </td>
-                <td>
-                    <div class="action-btns">
-                        <button class="action-btn" title="Sửa" onclick="editBH('${i.id}')"><i class="ph ph-pencil-simple"></i></button>
-                        <button class="action-btn" title="In" onclick="printRec('bh','${i.id}')"><i class="ph ph-printer"></i></button>
-                        <button class="action-btn btn-del" title="Xóa" onclick="deleteItem('bh','${i.id}')"><i class="ph ph-trash"></i></button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
-
-        let fSC = db_sc.sort((a,b) => parseDate(b.date) - parseDate(a.date)).filter(i => {
-            const matchSearch = (String(i.customer) + String(i.device) + String(i.id)).toLowerCase().includes(searchTerm);
-            const matchStatus = fVal === "all" ? true : (fVal === "overdue" ? isOverdue(i.date, i.status) : i.status == fVal);
-            return matchSearch && matchStatus;
-        });
-
-        document.getElementById('tbody-sc').innerHTML = fSC.map(i => `
-            <tr>
-                <td>
-                    ${i.date == today ? '<span style="color:var(--success);font-weight:bold;font-size:10px">HÔM NAY</span><br>' : ''}
-                    ${isOverdue(i.date, i.status) ? '<i class="ph ph-warning overdue-alert" title="Quá hạn 7 ngày"></i>' : ''}
-                    <b>${i.date}</b><br><small style="color:#94a3b8">#${i.id}</small>
-                </td>
-                <td><b>${i.customer}</b> <i class="ph ph-copy copy-tag" onclick="copy('${i.customer}','tên khách')"></i><br>${i.device}</td>
-                <td><b>${Number(i.cost).toLocaleString()}đ</b></td>
-                <td>
-                    <select onchange="updateSt('sc','${i.id}',this.value)" class="status st-${i.status}">
-                        <option value="0" ${i.status==0?'selected':''}>Mới nhận</option>
-                        <option value="1" ${i.status==1?'selected':''}>Đang sửa</option>
-                        <option value="2" ${i.status==2?'selected':''}>Đã trả</option>
-                    </select>
-                </td>
-                <td>
-                    <div class="action-btns">
-                        <button class="action-btn" onclick="editSC('${i.id}')"><i class="ph ph-pencil-simple"></i></button>
-                        <button class="action-btn" onclick="printRec('sc','${i.id}')"><i class="ph ph-printer"></i></button>
-                        <button class="action-btn btn-del" onclick="deleteItem('sc','${i.id}')"><i class="ph ph-trash"></i></button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
-        updateStats();
-    }
-
-    function editBH(id) {
-        const i = db_bh.find(x=>x.id==id);
-        document.getElementById('bh-id').value = i.id;
-        document.getElementById('bh-to').value = i.to || "";
-        document.getElementById('bh-cust').value = i.customer || "";
-        document.getElementById('bh-prod').value = i.product || "";
-        document.getElementById('bh-sn').value = i.serial || "";
-        document.getElementById('bh-note').value = i.note || "";
-        document.getElementById('bh-loan').value = i.loanItem || "";
-        window.scrollTo({top: 0, behavior: 'smooth'});
-        notify("Đã tải dữ liệu lên form sửa");
-    }
-
-    function editSC(id) {
-        const i = db_sc.find(x=>x.id==id);
-        document.getElementById('sc-id').value = i.id;
-        document.getElementById('sc-cust').value = i.customer || "";
-        document.getElementById('sc-dev').value = i.device || "";
-        document.getElementById('sc-issue').value = i.issue || "";
-        document.getElementById('sc-cost').value = i.cost || 0;
-        document.getElementById('sc-dep').value = i.deposit || 0;
-        window.scrollTo({top: 0, behavior: 'smooth'});
-        notify("Đã tải dữ liệu lên form sửa");
-    }
-
-    function printRec(type, id) {
-        const item = type === 'bh'
-            ? db_bh.find(x => x.id == id)
-            : db_sc.find(x => x.id == id);
-
-        document.getElementById('receipt-type').innerText =
-            type === 'bh' ? 'PHIẾU BẢO HÀNH' : 'PHIẾU SỬA CHỮA';
-
-        document.getElementById('receipt-content').innerHTML = `
-            <div class="receipt-row"><span>Mã đơn</span><span>#${item.id}</span></div>
-            <div class="receipt-row"><span>Ngày nhận</span><span>${item.date}</span></div>
-
-            <div class="receipt-divider"></div>
-
-            <div class="receipt-row"><span>Khách hàng</span><span>${item.customer}</span></div>
-            <div class="receipt-row"><span>Linh kiện</span><span>${type === 'bh' ? item.product : item.device}</span></div>
-            
-            ${type === 'bh' ? `<div class="receipt-row"><span>Nơi gửi BH</span><span>${item.to || '-'}</span></div>` : ''}
-
-            ${type === 'bh'
-                ? `<div class="receipt-row"><span>Mượn đồ</span><span>${item.loanItem || 'Không'}</span></div>`
-                : `<div class="receipt-row"><span>Phí sửa</span><span>${Number(item.cost).toLocaleString()}đ</span></div>`
-            }
-
-            <div class="receipt-divider"></div>
-
-            <div class="receipt-row">
-                <span>Ghi chú</span>
-                <span>${(type === 'bh' ? item.note : item.issue) || 'Không có'}</span>
-            </div>
-        `;
-
-        const qrData = `PC NHON TRACH | ${item.id} | ${item.customer}`;
-        document.getElementById('qr-code').src =
-            `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
-
-        document.getElementById('qr-code').onload = () => window.print();
-    }
-
-    function updateSt(type, id, val) {
-        const list = type === 'bh' ? db_bh : db_sc;
-        const item = list.find(x => x.id == id);
-        if(item) {
-            item.status = parseInt(val);
-            saveLocal(); render();
-            notify("Đã cập nhật trạng thái đơn!");
-        }
-    }
-
-    function exportExcelAll() {
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db_bh), "BaoHanh");
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db_sc), "SuaChua");
-        XLSX.writeFile(wb, `PC_NhonTrach_${new Date().toLocaleDateString('vi-VN')}.xlsx`);
-    }
-
-    window.onload = () => { render(); notify("PC NHƠN TRẠCH Sẵn sàng!"); };
+window.addEventListener('online',()=>{if(dirty)cloudSync()});
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+window.onload=()=>{
+  let t='light';try{t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}
+  applyTheme(t);
+  render();notify('PC NHƠN TRẠCH sẵn sàng!');
+  if(!db_bh.length&&!db_sc.length)cloudRestore(true);
+};
+</script>
+<script>
+(function(){
+  const B=document.body,mq=matchMedia('(max-width:700px)');
+  const open=()=>B.classList.add('sheet'),close=()=>B.classList.remove('sheet');
+  window.openSheet=open;window.closeSheet=close;
+  window.fabAdd=()=>{resetForm(page,true);open()};
+  const se=startEdit;startEdit=function(t,id){se(t,id);if(mq.matches)open()};
+  const sp=showPage;showPage=function(id){close();sp(id);['bh','sc'].forEach(k=>$('bn-'+k).classList.toggle('on',k===id))};
+  const rn=render;render=function(){rn();['bh','sc'].forEach(k=>{const n=$('n-'+k).textContent,b=$('bn-n-'+k);b.textContent=n;b.style.display=n==='0'?'none':''})};
+  ['form-bh','form-sc'].forEach(id=>$(id).addEventListener('submit',close));
+  document.querySelectorAll('.card>div:first-child').forEach(d=>{
+    const b=document.createElement('button');b.type='button';b.className='ab sx';b.title='Đóng';b.setAttribute('aria-label','Đóng');
+    b.innerHTML='<i aria-hidden="true" class="ph ph-x"></i>';b.onclick=close;d.appendChild(b)});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+  document.querySelectorAll('.nav').forEach(n=>{n.setAttribute('role','button');n.setAttribute('tabindex','0')});
+  document.addEventListener('keydown',e=>{
+    const t=e.target;
+    if((e.key==='Enter'||e.key===' ')&&t&&t.matches&&t.matches('.cp,.nav')){e.preventDefault();t.click()}
+  });
+  if(mq.addEventListener)mq.addEventListener('change',e=>{if(!e.matches)close()});
+})();
 </script>
 </body>
 </html>

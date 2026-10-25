@@ -19,7 +19,7 @@ aside{width:250px;background:linear-gradient(180deg,#0f172a,#1e1b4b);color:#fff;
 .nav b{margin-left:auto;font-size:11px;background:rgba(255,255,255,.15);padding:2px 8px;border-radius:20px}
 .nav.on b{background:var(--pl)}
 .side-foot{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
-.sync{display:flex;align-items:center;gap:8px;font-size:11px;color:#a5b4fc;margin-bottom:10px}
+.sync{display:flex;align-items:center;gap:8px;font-size:11px;color:#a5b4fc;margin-bottom:10px;cursor:pointer;padding:4px 2px;border-radius:8px}.sync:hover{color:#fff}
 .dot{width:8px;height:8px;border-radius:50%;background:#94a3b8}
 .dot.ok{background:var(--ok)}.dot.err{background:var(--bad)}.dot.busy{background:var(--acc);animation:bl 1s infinite}
 @keyframes bl{50%{opacity:.3}}
@@ -90,12 +90,6 @@ td small{color:#94a3b8}
 a.tel{color:var(--ok);margin-left:4px;font-size:14px;text-decoration:none;vertical-align:middle}
 .tools{display:flex;gap:6px;margin-bottom:8px}.tools .btn{flex:1;padding:9px 0}
 .age{font-size:10px;font-weight:700;color:var(--mut)}.age.old{color:var(--bad)}
-[data-theme=dark]{--ink:#e2e8f0;--mut:#94a3b8;--bg:#0b1020;--bd:#273049;--pl:#1e1b4b;--sh:0 8px 24px -8px rgba(0,0,0,.6)}
-[data-theme=dark] :is(.top,.stat,.card,.tbl,.toast,.lb,.chip,.search kbd){background:#141b30;color:var(--ink)}
-[data-theme=dark] :is(input,select,textarea,th,.ab,.bg,.search input){background:#1a2340;color:var(--ink);border-color:var(--bd)}
-[data-theme=dark] td{border-color:var(--bd)}[data-theme=dark] tr:hover td{background:#18213b}
-[data-theme=dark] .loan{background:#2a2110}[data-theme=dark] .nav.on{background:#e0e7ff}
-[data-theme=dark] .chip.on{background:var(--p);color:#fff}
 @media print{html body{background:#fff!important}
 body{display:block;height:auto;overflow:visible}body>*:not(#rp){display:none!important}#rp{display:block}}
 @media(max-width:900px){
@@ -111,8 +105,6 @@ main{padding:12px;overflow:visible}
 }
 #bnav,#sheet-bg{display:none}
 .sx{display:none}
-[data-theme=dark] #bnav{background:#141b30}
-[data-theme=dark] tbody tr{background:#141b30}
 @media print{body{padding:0!important}}
 @media(max-width:700px){
 body{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
@@ -174,7 +166,6 @@ body.sheet #sheet-bg{opacity:1;pointer-events:auto}
 }
 
 /* === UI/UX polish: focus, contrast, motion, touch === */
-:root{color-scheme:light}[data-theme=dark]{color-scheme:dark}
 button,select,[role=button],.chip,.nav{cursor:pointer}
 :focus-visible{outline:3px solid var(--p2);outline-offset:2px}
 input:focus-visible,select:focus-visible,textarea:focus-visible{outline-offset:0}
@@ -183,9 +174,6 @@ td{overflow-wrap:break-word}td:first-child{white-space:nowrap}h3{text-wrap:balan
 .stat p,td b,.rr span{font-variant-numeric:tabular-nums}
 td small{color:var(--mut)}
 .st0{color:#b91c1c}.st1{color:#b45309}.st2{color:#047857}
-[data-theme=dark] select.st0{background:#fee2e2;color:#b91c1c}
-[data-theme=dark] select.st1{background:#fef3c7;color:#b45309}
-[data-theme=dark] select.st2{background:#dcfce7;color:#047857}
 .tag.today{color:#047857}.tag.lo{color:#451a03}
 a.tel{color:#047857}
 label:has(+input[required])::after,label:has(+textarea[required])::after{content:' *';color:var(--bad)}
@@ -238,14 +226,12 @@ tbody tr:has(.st2){border-left-color:#059669}
   <div class="nav on" id="nav-bh" onclick="showPage('bh')"><i aria-hidden="true" class="ph ph-shield-check"></i> Bảo hành <b id="n-bh">0</b></div>
   <div class="nav" id="nav-sc" onclick="showPage('sc')"><i aria-hidden="true" class="ph ph-wrench"></i> Sửa chữa <b id="n-sc">0</b></div>
   <div class="side-foot">
-    <div class="sync"><i class="dot" id="dot" aria-hidden="true"></i><span id="sync-txt">Chưa đồng bộ</span></div>
+    <div class="sync" id="sync" role="button" tabindex="0" title="Tự động đồng bộ - bấm để đồng bộ ngay" aria-label="Trạng thái đồng bộ - bấm để đồng bộ ngay" onclick="cloudSync(true)"><i class="dot" id="dot" aria-hidden="true"></i><span id="sync-txt">Tự động đồng bộ</span></div>
     <div class="tools">
-      <button class="btn bg" title="Chế độ sáng/tối" aria-label="Chế độ sáng/tối" onclick="toggleTheme()"><i aria-hidden="true" class="ph ph-moon" id="theme-ic"></i></button>
       <button class="btn bg" title="Sao lưu ra file JSON" aria-label="Sao lưu ra file JSON" onclick="backupJson()"><i aria-hidden="true" class="ph ph-download-simple"></i></button>
       <button class="btn bg" title="Khôi phục từ file JSON" aria-label="Khôi phục từ file JSON" onclick="$('imp').click()"><i aria-hidden="true" class="ph ph-upload-simple"></i></button>
       <input type="file" id="imp" aria-label="Chọn file sao lưu JSON" accept=".json,application/json" hidden onchange="importJson(this)">
     </div>
-    <button class="btn bg" onclick="cloudSync(true)"><i aria-hidden="true" class="ph ph-arrows-clockwise"></i> Đồng bộ</button>
   </div>
 </aside>
 
@@ -259,7 +245,6 @@ tbody tr:has(.st2){border-left-color:#059669}
     <select id="sortSel" title="Sắp xếp" aria-label="Sắp xếp danh sách" style="width:auto" onchange="sortMode=this.value;render()">
       <option value="new">Mới nhất trước</option><option value="old">Cũ nhất trước</option><option value="stuck">Tồn lâu nhất trước</option>
     </select>
-    <button class="btn bg" onclick="cloudRestore()"><i aria-hidden="true" class="ph ph-cloud-arrow-down"></i> Tải dữ liệu</button>
     <button class="btn bg" onclick="exportExcelAll()"><i aria-hidden="true" class="ph ph-file-xls"></i> Excel</button>
     <button class="btn bg" title="Nhập phiếu từ file Excel hoặc CSV" aria-label="Nhập phiếu từ file Excel hoặc CSV" onclick="$('xl').click()"><i aria-hidden="true" class="ph ph-file-arrow-up"></i> Nhập Excel</button>
     <button class="btn bg" title="Tải file Excel mẫu để nhập" aria-label="Tải file Excel mẫu" onclick="downloadTemplate()"><i aria-hidden="true" class="ph ph-table"></i> File mẫu</button>
@@ -353,7 +338,7 @@ tbody tr:has(.st2){border-left-color:#059669}
 <script>
 const G_URL='https://script.google.com/macros/s/AKfycbyZKTxQweonx1b1J59qS0P2UGIyBoWsLgTjjkP0vdqqc9KxVxpDC-Fe60IWGmaonepMCw/exec';
 const load=k=>{try{return JSON.parse(localStorage.getItem(k)||'[]')}catch(e){return[]}};
-let dirty=false,sortMode='new';let db_bh=load('db_bh'),db_sc=load('db_sc'),searchTerm='',filter='all',page='bh',pending=null,syncTimer=null;
+let dirty=false,sortMode='new',rev=0,syncing=false,pulling=false;try{dirty=localStorage.getItem('dirty')==='1'}catch(e){}let db_bh=load('db_bh'),db_sc=load('db_sc'),searchTerm='',filter='all',page='bh',pending=null;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>(Number(n)||0).toLocaleString('vi-VN')+'đ';
@@ -403,14 +388,6 @@ function phoneLink(s){
   const n=m[0].replace(/[^\d+]/g,'');
   return `<a class="tel" href="tel:${esc(n)}" title="Gọi ${esc(n)}"><i aria-hidden="true" class="ph ph-phone"></i></a>`;
 }
-function applyTheme(t){
-  document.documentElement.setAttribute('data-theme',t);
-  $('theme-ic').className='ph '+(t==='dark'?'ph-sun':'ph-moon');
-}
-function toggleTheme(){
-  const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
-  try{localStorage.setItem('theme',t)}catch(e){}applyTheme(t);
-}
 function backupJson(){
   const blob=new Blob([JSON.stringify({db_bh,db_sc},null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
@@ -434,7 +411,7 @@ function importJson(inp){
   };
   r.readAsText(f);
 }
-function setSync(state,txt){$('dot').className='dot '+state;$('sync-txt').textContent=txt}
+function setSync(state,txt){$('dot').className='dot '+state;$('sync-txt').textContent=txt;$('sync').title=txt+' - bấm để đồng bộ ngay'}
 
 function showPage(id){
   page=id;
@@ -466,29 +443,56 @@ function startEdit(t,id){
   notify('Đã tải dữ liệu lên form sửa');
 }
 
+const hhmm=()=>new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+function setDirty(v){dirty=v;try{localStorage.setItem('dirty',v?'1':'0')}catch(e){}}
 async function cloudSync(manual=false){
+  if(syncing)return;
+  syncing=true;const my=rev;let again=false;
   setSync('busy','Đang đồng bộ...');if(manual)notify('Đang đồng bộ dữ liệu...');
+  let refused=false;
   try{
-    await fetch(G_URL,{method:'POST',body:JSON.stringify({db_bh,db_sc})});
-    dirty=false;setSync('ok','Đã đồng bộ '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}));
+    const res=await fetch(G_URL,{method:'POST',body:JSON.stringify({db_bh,db_sc})});
+    let r=null;try{r=await res.json()}catch(e){}
+    if(r&&r.ok===false){refused=r.error==='EMPTY_REFUSED';throw new Error(r.error||'server')}
+    again=rev!==my;setDirty(again);setSync('ok','Đã đồng bộ '+hhmm());
     if(manual)notify('Đồng bộ hoàn tất!','#10b981');
-  }catch(e){dirty=true;setSync('err','Lỗi đồng bộ - sẽ thử lại khi có mạng');if(manual)notify('Lỗi đồng bộ Cloud','#ef4444')}
+  }catch(e){
+    setDirty(true);
+    setSync('err',refused?'Sheet từ chối xóa sạch dữ liệu':'Lỗi đồng bộ - sẽ tự thử lại');
+    if(manual)notify(refused?'Sheet không cho xóa sạch toàn bộ dữ liệu':'Lỗi đồng bộ Cloud','#ef4444');
+    if(!refused)setTimeout(()=>{if(dirty&&!syncing)cloudSync()},30000);
+  }finally{syncing=false;if(again)cloudSync()}
 }
-async function cloudRestore(silent=false){
-  if(!silent)notify('Đang tải dữ liệu Cloud...');setSync('busy','Đang tải...');
+// ---- Tự động lấy dữ liệu mới từ Google Sheet ----
+const canon=(a,b)=>[...a,...b].map(x=>[x.id,x.date,x.to||'',x.customer||'',x.product||x.device||'',x.serial||'',x.note||x.issue||'',x.loanItem||'',Number(x.status)||0,Number(x.cost)||0,Number(x.deposit)||0,x.upd||''].join('\u0001')).sort().join('\u0002');
+function uiBusy(){
+  const a=document.activeElement;
+  return $('ov').style.display==='flex'||$('ovx').style.display==='flex'||!!pendingImport||!!(a&&a.matches&&a.matches('#tb-bh select,#tb-sc select'));
+}
+async function autoPull(){
+  if(pulling||syncing||dirty||document.hidden||uiBusy())return;
+  pulling=true;const my=rev;
   try{
-    const d=await (await fetch(G_URL)).json();
-    db_bh=d.db_bh||[];db_sc=d.db_sc||[];persist();render();
-    setSync('ok','Đã tải từ Cloud');if(!silent)notify('Tải dữ liệu thành công!','#10b981');
-  }catch(e){setSync('err','Lỗi tải dữ liệu');if(!silent)notify('Lỗi tải dữ liệu','#ef4444')}
+    const d=await (await fetch(G_URL,{cache:'no-store'})).json();
+    if(!d||!Array.isArray(d.db_bh)||!Array.isArray(d.db_sc))throw new Error('bad');
+    if(dirty||rev!==my)return;                       // vừa sửa trong lúc tải -> không ghi đè
+    if(!d.db_bh.length&&!d.db_sc.length&&(db_bh.length||db_sc.length)){pulling=false;setDirty(true);cloudSync();return}
+    if(canon(db_bh,db_sc)!==canon(d.db_bh,d.db_sc)){
+      const fresh=!db_bh.length&&!db_sc.length;
+      db_bh=d.db_bh;db_sc=d.db_sc;persist();render();
+      setSync('ok','Đã cập nhật từ Sheet '+hhmm());
+      if(!fresh)notify('Đã cập nhật dữ liệu mới từ Google Sheet','#10b981');
+    }else setSync('ok','Đã đồng bộ '+hhmm());
+  }catch(e){setSync('err','Chưa kết nối được Google Sheet')}
+  finally{pulling=false}
 }
 function persist(){
   localStorage.setItem('db_bh',JSON.stringify(db_bh));
   localStorage.setItem('db_sc',JSON.stringify(db_sc));
 }
 function saveLocal(){
-  persist();updateStats();dirty=true;
-  clearTimeout(syncTimer);syncTimer=setTimeout(()=>cloudSync(),700);
+  persist();updateStats();rev++;setDirty(true);
+  cloudSync();
 }
 
 function deleteItem(type,id){
@@ -743,13 +747,14 @@ function exportExcelAll(){
   XLSX.writeFile(wb,`PC_NhonTrach_${new Date().toLocaleDateString('vi-VN').replace(/\//g,'-')}.xlsx`);
 }
 
-window.addEventListener('online',()=>{if(dirty)cloudSync()});
+window.addEventListener('online',()=>{dirty?cloudSync():autoPull()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)dirty?cloudSync():autoPull()});
+setInterval(()=>{if(!document.hidden)dirty?cloudSync():autoPull()},60000);
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
 window.onload=()=>{
-  let t='light';try{t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}
-  applyTheme(t);
   render();notify('PC NHƠN TRẠCH sẵn sàng!');
-  if(!db_bh.length&&!db_sc.length)cloudRestore(true);
+  setSync('','Tự động đồng bộ');
+  dirty?cloudSync():autoPull();
 };
 </script>
 <script>
@@ -769,7 +774,7 @@ window.onload=()=>{
   document.querySelectorAll('.nav').forEach(n=>{n.setAttribute('role','button');n.setAttribute('tabindex','0')});
   document.addEventListener('keydown',e=>{
     const t=e.target;
-    if((e.key==='Enter'||e.key===' ')&&t&&t.matches&&t.matches('.cp,.nav')){e.preventDefault();t.click()}
+    if((e.key==='Enter'||e.key===' ')&&t&&t.matches&&t.matches('.cp,.nav,.sync')){e.preventDefault();t.click()}
   });
   if(mq.addEventListener)mq.addEventListener('change',e=>{if(!e.matches)close()});
 })();
